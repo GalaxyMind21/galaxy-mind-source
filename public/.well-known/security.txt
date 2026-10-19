@@ -1,0 +1,16 @@
+# Security policy for Galaxy Mind (galaxymind.space)
+# Bitcoin tools & merchant directory
+
+Contact: https://x.com/GalaxyMind
+Contact: https://njump.me/nprofile1qqspwnkez659yrnzx2fu4kzpngtkak7v3sdpuh6jw83key38xru5wrcny0sdm
+Preferred-Languages: en
+Canonical: https://galaxymind.space/.well-known/security.txt
+
+# Required by RFC 9116. Bump this within a year of the date below.
+Expires: 2027-06-26T00:00:00.000Z
+
+# We take security seriously. Reports of vulnerabilities in our
+# infrastructure, client-side code, or the curated vendor data are welcome.
+# Please include reproduction steps and (if possible) a minimal PoC.
+
+# This file is served statically and committed to the repository.

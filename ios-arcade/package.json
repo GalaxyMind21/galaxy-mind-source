@@ -1,0 +1,37 @@
+{
+  "name": "galaxy-mind-arcade",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Galaxy Mind: Bitcoin Games. Offline Capacitor shell for the Galaxy Mind arcade. No secrets.",
+  "scripts": {
+    "sync": "node scripts/sync-games.mjs",
+    "refresh-fixtures": "node scripts/refresh-fixtures.mjs",
+    "apply-config": "node scripts/apply-config.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "check": "node scripts/validate.mjs",
+    "touch-test": "node scripts/touch-test.mjs",
+    "screenshots": "node scripts/screenshots.mjs",
+    "cap:sync": "cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.4.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@tailwindcss/cli": "^4.1.14",
+    "esbuild": "^0.25.10",
+    "puppeteer-core": "^25.14.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.1.14"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "@parcel/watcher": "^2.5.6"
+  }
+}

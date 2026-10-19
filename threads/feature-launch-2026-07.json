@@ -1,0 +1,12 @@
+{
+  "description": "Launch thread for the 2026-07-07 ten-feature drop. Tweet 1 leads with the map (the most screenshot-shaped asset · attach a /map screenshot before posting). Each subsequent tweet is one feature with its URL so quote-RTs can split off any single item. Post manually via the X UI (API creds not provisioned) · or cherry-pick tweets 1, 3, and 5 as standalone posts across the week instead of one thread. Numbers current as of 2026-07-07: 120 vendors, 20 countries.",
+  "target": "x",
+  "tweets": [
+    "The bitcoin circular economy, mapped.\n\nEvery dot is a country where verified merchants take BTC for real goods. 120 shops, 20 countries, each one a tap away.\n\nNew on Galaxy Mind: galaxymind.space/map",
+    "Also new: the daily briefing.\n\nGauge verdict, bitcoin still purchasable, cheapest treasury, newest merchants. Four live numbers, one page, updated all day.\n\ngalaxymind.space/today",
+    "\"If I spend bitcoin I'll regret it when it moons.\"\n\nWe built a time machine so you can check. Pick an amount and a date: spending WITHOUT replacing is the only losing branch. Replace same day and your stack never notices.\n\ngalaxymind.space/spend-and-replace",
+    "For the treasury watchers: /treasuries now races each company against bitcoin itself over identical same-instant windows.\n\nDid the wrapper beat the coin? The chart answers daily.\n\ngalaxymind.space/treasuries",
+    "And for your own site: the Supply Clock is now embeddable. Two lines of HTML puts the falling bitcoin float on any page, ticking live.\n\nEvery embed grows the signal.\n\ngalaxymind.space/embed",
+    "Power user notes: press Cmd+K anywhere on the site to jump to any merchant, tool, or definition. And scroll the 21M grid on galaxymind.space/float · the supply story now tells itself.\n\nAll free, no ads, no listing fees. Built for bitcoiners who spend."
+  ]
+}

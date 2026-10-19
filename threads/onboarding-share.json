@@ -1,0 +1,7 @@
+{
+  "description": "Single tweet · sharing the new vendor onboarding flow",
+  "target": "x",
+  "tweets": [
+    "Vendor onboarding for galaxymind.space just got a serious speed boost.\n\nIf you sell anything for sats — physical goods, services, art, books — drop me your handle (X / Nostr / Lightning).\n\nFor Nostr vendors I auto-pull your profile data. 60-second onboarding.\n\nDM me."
+  ]
+}

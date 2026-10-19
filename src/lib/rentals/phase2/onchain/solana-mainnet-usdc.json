@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-17T11:05:11+00:00",
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "method": "getAccountInfo jsonParsed finalized",
+  "slot": 458013572,
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "owner_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "parsed_type": "mint",
+  "decimals": 6,
+  "isInitialized": true,
+  "mintAuthority": "BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG",
+  "freezeAuthority": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar"
+}

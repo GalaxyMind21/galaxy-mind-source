@@ -1,0 +1,2 @@
+app_identifier("space.galaxymind.arcade")
+team_id(ENV["APPLE_TEAM_ID"])

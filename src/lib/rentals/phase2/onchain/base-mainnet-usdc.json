@@ -1,0 +1,15 @@
+{
+  "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "rpc": "https://mainnet.base.org",
+  "chainId": "0x2105",
+  "blockNumber": "0x323f90c",
+  "blockNumberDec": 52689164,
+  "verifiedAt": "2026-10-16T16:21:17.113Z",
+  "codeBytes": 1852,
+  "codeKeccak": "0xa6705a10bb756b5dea144591118be77d7af0c3eee3bf2dfe2583dcb0364fefab",
+  "name": "USD Coin",
+  "eip712Version": "2",
+  "symbol": "USDC",
+  "decimals": 6,
+  "note": "eth_getCode non-empty; symbol()=USDC; decimals()=6. name()/version() are the EIP-712 domain. Independent on-chain check recorded. Re-run: node scripts/verify-base-usdc.mjs. The …D4b71… variant has empty code."
+}

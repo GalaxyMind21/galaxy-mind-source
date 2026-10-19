@@ -1,0 +1,14 @@
+import { keccak_256 } from "@noble/hashes/sha3.js";
+const A = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", R = "https://mainnet.base.org";
+const call = async (method, params) => (await (await fetch(R, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) })).json()).result;
+const block = await call("eth_blockNumber", []);
+const chain = await call("eth_chainId", []);
+const code = await call("eth_getCode", [A, block]);
+const sym = await call("eth_call", [{ to: A, data: "0x95d89b41" }, block]);
+const dec = await call("eth_call", [{ to: A, data: "0x313ce567" }, block]);
+const name = await call("eth_call", [{ to: A, data: "0x06fdde03" }, block]);
+const ver = await call("eth_call", [{ to: A, data: "0x54fd4d50" }, block]);
+const str = (h) => { const b = Buffer.from(h.slice(2), "hex"); const n = Number(BigInt("0x" + b.subarray(32, 64).toString("hex"))); return b.subarray(64, 64 + n).toString("utf8"); };
+const hex = (u) => Buffer.from(u).toString("hex");
+const rec = { address: A, rpc: R, chainId: chain, blockNumber: block, blockNumberDec: Number(BigInt(block)), verifiedAt: new Date().toISOString(), codeBytes: (code.length - 2) / 2, codeKeccak: "0x" + hex(keccak_256(Buffer.from(code.slice(2), "hex"))), name: str(name), eip712Version: str(ver), symbol: str(sym), decimals: Number(BigInt(dec)), note: "eth_getCode non-empty; symbol()=USDC; decimals()=6. name()/version() are the EIP-712 domain. Independent on-chain check recorded. Re-run: node scripts/verify-base-usdc.mjs. The …D4b71… variant has empty code." };
+console.log(JSON.stringify(rec, null, 2));

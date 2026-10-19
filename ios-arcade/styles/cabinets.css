@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@source "../../src/app/wen";
+@source "../../src/app/gauntlet";
+@source "../../src/app/runner";
+@source "../../src/app/horizon";
+@source "../../src/app/trail";
+
+/* Night Bench tokens the React cabinets actually read. Plus Jakarta Sans is the
+   same face the site hosts. Mono stays a system face: it only ticks. */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-base: #12110f;
+  --bg-elevated: #1c1a16;
+  --bg-elevated-2: #26231e;
+  --border-subtle: rgba(247, 238, 224, 0.085);
+  --text-primary: #f2efe9;
+  --text-secondary: #a5a096;
+  --text-tertiary: #948f84;
+  --accent: #f7931a;
+  --accent-ink: #f7931a;
+  --accent-hover: #ffa940;
+  --cool-ink: #7ec0ff;
+  --success: #4ade80;
+  --warning: #fb923c;
+  --danger: #f87171;
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --font-site-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-jetbrains-mono: ui-monospace, ui-monospace, monospace;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-base: 0.875rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1rem;
+  --t-xl: 1.0625rem;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-site-sans);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html, body {
+  font-size: 106.25%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-site-sans);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+/* Node Runner's cabinet uses -mx-4 to cancel the site page's px-4 and
+   sit edge to edge. This app renders the cabinet with no page padding,
+   so the same negative margin scrolls a 390px iPhone by about 17px.
+   Zeroing it keeps the full-bleed phone layout the class was written for. */
+[class~="-mx-4"] {
+  margin-inline: 0;
+}
+
+.display-title {
+  font-size: clamp(2rem, 5.6vw, 3.25rem);
+  font-weight: 500 !important;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  text-wrap: balance;
+  color: var(--text-primary);
+}
+
+.headline-gradient {
+  color: inherit;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.glow-text,
+.display-title .glow-text {
+  text-shadow: none;
+}
+
+.t-xs { font-size: var(--t-xs); }
+.t-sm { font-size: var(--t-sm); }
+
+.micro-label {
+  font-family: var(--font-jetbrains-mono);
+  font-size: var(--t-xs);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}

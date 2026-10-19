@@ -1,0 +1,21 @@
+{
+  "description": "8-tweet thread · weekend changes recap",
+  "target": "x",
+  "tweets": [
+    "🧵 Big weekend at galaxymind.space.\n\nThe vendor directory grew real circular-economy primitives. Here's everything that shipped:",
+
+    "1/ Every vendor now has their own page at galaxymind.space/v/[handle]\n\nCustom OG card with the vendor's brand. LocalBusiness schema (paymentAccepted: Bitcoin + Lightning).\n\nTheir listing is now a real online presence, not just a row in a table.",
+
+    "2/ Click any vendor on the directory and a magnified popup opens — you stay on Galaxy Mind.\n\nUse ←/→ to flip through vendors like a slide deck. Esc to close.\n\nThe bouncing-off-on-first-click problem is solved.",
+
+    "3/ Vendors can now signal what they're \"Open to trade for\"\n\nExample: @IxTechCrypto sells Bitaxe miners and would barter them for consumables or apparel.\n\nFirst concrete hook in the circular economy direction.",
+
+    "4/ Vendors silent on Nostr >30 days auto-tuck away from the front page (instead of being featured-of-the-week).\n\nThey reappear when they post again. Their /v/[slug] page stays live with a \"currently quiet\" banner.\n\nReversible, no irreversible deletes.",
+
+    "5/ New this week 🇩🇪🇺🇸:\n\n· @Bitaxeshop — Bitaxe miners shipped from Germany\n· @IxTechCrypto — Bitaxe + Nerdaxe + 3D-printed accessories + laser-etched art\n· @GingerSherpa — BlockTron LED Bitcoin price ticker\n\nBitcoin home-hardware is having a moment.",
+
+    "6/ Vendor onboarding is now an interactive CLI that auto-pulls profile data from Nostr (description, Lightning Address, NIP-05, website).\n\n60-second onboarding.\n\nIf you sell anything for sats and aren't on the directory — DM me.",
+
+    "7/ The bigger picture: galaxymind.space is the connector layer for the Bitcoin circular economy.\n\nNot a marketplace. Discovery + connection. Settlement on Lightning / on-chain / in person — infrastructure you already use.\n\n56 vendors, 12 countries, growing."
+  ]
+}

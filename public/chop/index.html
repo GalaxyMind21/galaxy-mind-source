@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  CHOP · Galaxy Mind Arcade flagship candidate (2026-07-27)
+  Slice the LATEST bitcoin block's transactions to the beat.
+  Fruit Ninja verb × Beat Saber pulse × the live chain.
+
+  ENGINE
+    Three.js r0.185 (VENDORED same-origin at /chop/vendor/ · an
+    operator-approved exception to the arcade's zero-deps rule, made
+    for the AAA materials/post bar). ACES tone mapping, UnrealBloom,
+    code-generated adaptive soundtrack (136 BPM cyberpunk midtempo ·
+    js/music.js). Live world via same-origin /api/chop-block — the
+    static CSP stays connect-src 'self'.
+
+  STATUS: LIVE (launched 2026-08-04 · operator call). Indexed, in the
+  arcade hub, nav, footer, palette and sitemap.
+
+  DISCLAIMER
+    Unofficial fan work. Block data © the bitcoin network itself.
+-->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#050508" />
+<title>CHOP · slice the latest bitcoin block · Galaxy Mind</title>
+<meta name="description" content="Slice the latest bitcoin block to the beat. Every cube is one of its transactions. Free to play, no download, works on your phone." />
+<link rel="canonical" href="https://galaxymind.space/chop" />
+<meta property="og:title" content="CHOP · slice the latest bitcoin block" />
+<meta property="og:description" content="A rhythm slicer where the level is the newest block on the bitcoin chain. Swipe to the music, chain a combo that climbs in pitch, seal the block." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://galaxymind.space/chop" />
+<meta property="og:image" content="https://galaxymind.space/chop/og.png" />
+<meta property="og:image:alt" content="CHOP title card: glowing CHOP lettering over a neon city at night, with the line Slice the latest bitcoin block. Free, plays in your browser." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@GalaxyMind" />
+<meta name="twitter:title" content="CHOP · slice the latest bitcoin block" />
+<meta name="twitter:description" content="A rhythm slicer where the level is the newest bitcoin block. Free, in your browser, on your phone." />
+<meta name="twitter:image" content="https://galaxymind.space/chop/og.png" />
+<meta name="twitter:image:alt" content="CHOP title card: glowing CHOP lettering over a neon city at night, with the line Slice the latest bitcoin block. Free, plays in your browser." />
+<link rel="stylesheet" href="/chop/style.css" />
+<!-- Structured data (SEO desk fix, 2026-10-18). An inert data block, so the
+     static CSP never has to allow it. Facts mirror the meta tags above. -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":["VideoGame","WebApplication"],"@id":"https://galaxymind.space/chop#game",
+  "name":"CHOP","url":"https://galaxymind.space/chop",
+  "description":"A free rhythm slicer where the level is the newest block on the bitcoin chain. Every cube is one of its transactions. Swipe to the music, chain a combo and seal the block.",
+  "image":"https://galaxymind.space/chop/og.png",
+  "genre":["Rhythm","Arcade"],"gamePlatform":"Web browser","playMode":"SinglePlayer",
+  "applicationCategory":"GameApplication","operatingSystem":"Any (web browser)",
+  "isAccessibleForFree":true,
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "author":{"@id":"https://galaxymind.space/#org"},
+  "publisher":{"@id":"https://galaxymind.space/#org"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Galaxy Mind","item":"https://galaxymind.space/"},
+  {"@type":"ListItem","position":2,"name":"Arcade","item":"https://galaxymind.space/arcade"},
+  {"@type":"ListItem","position":3,"name":"CHOP","item":"https://galaxymind.space/chop"}]}
+]}
+</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+
+  <!-- drop-downbeat exhale · DOM flash, animated by class, reduced-motion gated in JS -->
+  <div id="flash"></div>
+
+  <!-- ghost finger · the "how do I even touch this" demonstrator: a
+       looping touch-point that swipes through the tutorial note until
+       the player lands their first cut of the step -->
+  <div id="ghost"></div>
+
+  <!-- opening ceremony · the lead-in overlay: the block names itself,
+       then a beat-synced countdown hands off to the first note -->
+  <div id="intro"><div id="intro-line"></div><div id="intro-count"></div></div>
+
+  <!-- HUD · DOM overlay (score pops pooled, never re-created) -->
+  <div id="hud" aria-hidden="true">
+    <div id="hud-top">
+      <div id="hud-sats" class="mono">0 <span class="unit">sats</span></div>
+      <div id="hud-block" class="mono">SYNCING…</div>
+    </div>
+    <div id="hud-combo" class="mono"></div>
+    <!-- BLOCK INTEGRITY · the stakes, visible (first post-launch user:
+         "not clear how many misses I can get before losing"). Misses
+         drain it, clean cuts slowly heal it; at zero the block ORPHANS
+         and the run ends — the chain's own word for a block that didn't
+         make it. PLEB and the first three runs cannot orphan: the bar
+         still drains and refills there, teaching the stakes for free. -->
+    <div id="hud-integrity"><div id="hud-integrity-fill"></div></div>
+    <div id="hud-progress"><div id="hud-progress-fill"></div></div>
+    <div id="hud-txcount" class="mono"></div>
+    <div id="pops"></div>
+    <!-- DDR-style combo tower · the number IS the trophy. Sits in the
+         upper-centre band, translucent, BEHIND the score pops, so it can
+         be big without ever competing with the strike plane for the eye.
+         The small ×N pill top-left is a different quantity (the score
+         multiplier) and stays where it is. -->
+    <div id="combo-big" aria-hidden="true">
+      <div id="combo-num" class="mono">0</div>
+      <div id="combo-word" class="mono">COMBO</div>
+    </div>
+    <div id="praise" class="mono"></div>
+    <div id="teach"></div>
+  </div>
+  <!-- failure vignette · a miss had NO visual channel at all (it only
+       dropped the combo and played a 160ms sine), so a player who was
+       looking at the far queue never learned that anything went wrong.
+       Steel-blue on purpose: warm belongs to the verb and its rewards,
+       so failure must not borrow the reward colour. -->
+  <div id="missflash"></div>
+  <!-- Pause affordance · TOP-RIGHT, outside the thumb swipe arc.
+       Lanes sit centre-lower (ROW_Y 1.05/1.92, strike ~55–65% down);
+       combo docks top-left under sats. Right bezel is the only quiet
+       chrome band that never competes with a stroke. Hidden until play. -->
+  <button id="btn-pause" class="mono hidden" type="button" aria-label="Pause">II</button>
+  <button id="tut-skip" class="mono hidden">SKIP →</button>
+
+  <!-- teach gate · an instruction the player MUST be able to read.
+       #teach above is a non-blocking line that lives over live play; it is
+       right for "nice cut" texture and wrong for anything the player has
+       to act on, because nobody reads prose while cubes are flying at
+       them (operator, 2026-07-30). This one stops the chart — via the
+       same Music.stop() path as the pause menu, since the chart is driven
+       by Music.now() and a DOM-only overlay would desync every note — and
+       hands back with the ordinary 3-2-1 count-in. -->
+  <div id="teachgate" class="hidden">
+    <div id="teachgate-card">
+      <div id="teachgate-eyebrow" class="mono"></div>
+      <div id="teachgate-text"></div>
+      <button id="teachgate-go" class="mono" type="button">GOT IT →</button>
+    </div>
+  </div>
+
+  <!-- Boot / attract overlay · the AudioContext gesture gate -->
+  <div id="boot">
+    <div id="boot-card">
+      <div class="boot-eyebrow mono">GALAXY MIND ARCADE</div>
+      <h1>CHOP</h1>
+      <p id="boot-block" class="mono">finding the latest block…</p>
+      <p class="boot-pitch">Every note is an actual transaction from that block.
+        Swipe through it the way the arrow points.</p>
+      <div id="boot-legend">
+        <div class="legend-item"><span class="legend-chip dust"></span><span class="legend-label mono">LOW FEE</span></div>
+        <div class="legend-item"><span class="legend-chip mid"></span><span class="legend-label mono">MID FEE</span></div>
+        <div class="legend-item"><span class="legend-chip whale"></span><span class="legend-label mono">TOP FEE</span></div>
+      </div>
+      <p class="boot-pitch">Brighter paid more — and pays you more.</p>
+      <div id="boot-diff" aria-label="difficulty">
+        <button class="diff-chip mono" data-diff="pleb">PLEB</button>
+        <button class="diff-chip mono" data-diff="hodler">HODLER</button>
+        <button class="diff-chip mono" data-diff="maxi">MAXI</button>
+      </div>
+      <p id="boot-diff-desc"></p>
+      <p id="boot-rec" class="hidden"></p>
+      <button id="boot-start" class="mono">CHOP →</button>
+      <p class="boot-hint mono">Turn your volume up. Headphones hit harder.</p>
+      <button id="boot-tut" class="mono">HOW TO PLAY</button>
+      <button id="boot-settings" class="mono" type="button">SETTINGS</button>
+      <!-- The way out, and the ONLY outgoing links on this page.
+           bitcoin-kart and super-saylor each carry a visible
+           <section id="about"> with an #explore nav under the stage;
+           CHOP cannot, because its #stage is position:fixed over an
+           overflow:hidden body, so it shipped with zero outgoing links
+           and Ahrefs flagged it (2026-08-06). The boot overlay is the
+           one panel every single visitor lands on, so the link mesh
+           lives here: real links a player can use, never hidden SEO
+           text. #boot.gone flips visibility:hidden, so these stop
+           hit-testing over live play like every other overlay child. -->
+      <nav id="boot-explore" aria-label="More Galaxy Mind">
+        <a href="/arcade">More games</a>
+        <a href="/stack">Should I buy bitcoin?</a>
+        <a href="/float">How much BTC is left?</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Pause / settings menu · same glass language as the clear card.
+       Also opened from boot as settings-only (no RESUME/RESTART). -->
+  <div id="pause" class="hidden">
+    <div id="pause-card">
+      <div class="boot-eyebrow mono" id="pause-eyebrow">PAUSED</div>
+      <div id="pause-actions">
+        <button id="pause-resume" class="mono" type="button">RESUME</button>
+        <button id="pause-restart" class="mono menu-secondary" type="button">RESTART BLOCK</button>
+        <button id="pause-howto" class="mono menu-secondary" type="button">HOW TO PLAY</button>
+      </div>
+      <div id="settings">
+        <div class="settings-title mono">SETTINGS</div>
+        <div class="set-row">
+          <span class="set-label">Timing</span>
+          <span id="set-lat-readout" class="mono set-value">—</span>
+        </div>
+        <p id="set-lat-src" class="set-hint">Measuring from your cuts…</p>
+        <input id="set-lat" type="range" min="0" max="300" step="5" value="80" aria-label="Timing offset in milliseconds" />
+        <button id="set-lat-reset" class="mono menu-chip" type="button">RESET TIMING</button>
+        <div class="set-row">
+          <span class="set-label">Haptics</span>
+          <button id="set-haptics" class="mono set-toggle" type="button" aria-pressed="true">ON</button>
+        </div>
+        <div class="set-row">
+          <span class="set-label">Swipe guide</span>
+          <button id="set-guide" class="mono set-toggle" type="button" aria-pressed="true">ON</button>
+        </div>
+        <p class="set-hint">Shows the swipe direction on PLEB.</p>
+        <div class="set-row">
+          <span class="set-label">Audio</span>
+          <button id="set-audio" class="mono set-toggle" type="button" aria-pressed="true">ON</button>
+        </div>
+        <div class="set-row">
+          <span class="set-label">Anonymous stats</span>
+          <button id="set-stats" class="mono set-toggle" type="button" aria-pressed="true">ON</button>
+        </div>
+        <p class="set-hint">No accounts, no identifiers. Helps tune the game.</p>
+        <div class="set-row">
+          <span class="set-label">Reduce motion</span>
+          <button id="set-reduce" class="mono set-toggle" type="button" aria-pressed="false">AUTO</button>
+        </div>
+        <div class="set-row set-row-stack">
+          <span class="set-label">Difficulty</span>
+          <div id="pause-diff" aria-label="difficulty">
+            <button class="diff-chip mono" data-diff="pleb" type="button">PLEB</button>
+            <button class="diff-chip mono" data-diff="hodler" type="button">HODLER</button>
+            <button class="diff-chip mono" data-diff="maxi" type="button">MAXI</button>
+          </div>
+        </div>
+      </div>
+      <!-- CC-BY attribution · a licence obligation, populated from
+           MUSIC_CREDITS in main.js (kept in sync with audio/manifest.json) -->
+      <div id="music-credits"><div class="settings-title mono">MUSIC</div></div>
+      <button id="pause-close" class="mono menu-secondary hidden" type="button">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Stage-clear ceremony card -->
+  <div id="clear" class="hidden">
+    <div id="clear-card">
+      <div class="boot-eyebrow mono" id="clear-eyebrow">BLOCK CLEARED</div>
+      <div id="clear-grade" class="mono"></div>
+      <div id="clear-stats"></div>
+      <div id="clear-board" class="mono"></div>
+      <button id="clear-share" class="mono menu-secondary" type="button">SHARE →</button>
+      <button id="clear-next" class="mono">NEXT BLOCK →</button>
+    </div>
+  </div>
+</div>
+<script src="/arcade-open-browser.js"></script>
+<script type="module" src="/chop/js/main.js"></script>
+</body>
+</html>

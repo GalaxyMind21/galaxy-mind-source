@@ -1,0 +1,310 @@
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  color-scheme: dark;
+  background: #12110f;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body[data-gm-game] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#gm-chrome,
+#gm-note {
+  position: fixed;
+  box-sizing: border-box;
+  z-index: 2147483000;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#gm-chrome {
+  top: calc(env(safe-area-inset-top) + 8px);
+  left: calc(env(safe-area-inset-left) + 8px);
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 16px);
+}
+
+#gm-back,
+#gm-mute {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(18, 17, 15, 0.9);
+  color: #f2efe9;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  box-shadow: inset 0 1px 0 rgba(255, 246, 232, 0.16), 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+#gm-back {
+  padding: 0 14px 0 12px;
+}
+
+#gm-mute {
+  padding: 0 12px;
+}
+
+#gm-back:active,
+#gm-mute:active {
+  transform: scale(0.96);
+}
+
+#gm-note {
+  top: calc(env(safe-area-inset-top) + 60px);
+  left: max(8px, env(safe-area-inset-left));
+  right: max(8px, env(safe-area-inset-right));
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: #1c1a16;
+  color: #f2efe9;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+}
+
+body[data-gm-game="kart"] #gm-back,
+body[data-gm-game="kart"] #gm-mute,
+body[data-gm-game="chop"] #gm-back,
+body[data-gm-game="chop"] #gm-mute,
+body[data-gm-game="saylor"] #gm-back,
+body[data-gm-game="saylor"] #gm-mute {
+  background: rgba(18, 17, 15, 0.72);
+}
+
+/* Page games: keep the first line below the status bar and the Games row. */
+body[data-gm-game="wen"],
+body[data-gm-game="gauntlet"],
+body[data-gm-game="trail"] {
+  box-sizing: border-box;
+  margin: 0;
+  background: #12110f;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 52px)
+    max(12px, env(safe-area-inset-right, 0px))
+    max(16px, env(safe-area-inset-bottom, 0px))
+    max(12px, env(safe-area-inset-left, 0px));
+}
+
+body[data-gm-game="wen"] button,
+body[data-gm-game="gauntlet"] button,
+body[data-gm-game="trail"] button,
+body[data-gm-game="horizon"] button,
+body[data-gm-game="runner"] button {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+body[data-gm-game="trail"] input[type="range"],
+body[data-gm-game="wen"] input[type="range"] {
+  min-height: 44px;
+  height: 44px;
+  touch-action: manipulation;
+}
+
+/* Canvas games are the screen. The Games button is a fixed overlay, so
+   the stage is not padded into a letterbox. Safe areas stay on that
+   chrome. Each game sizes its bitmap from clientWidth/clientHeight. */
+body[data-gm-game="horizon"],
+body[data-gm-game="runner"] {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  overflow: hidden;
+  height: 100dvh;
+  background: #12110f;
+  padding: 0;
+}
+
+body[data-gm-game="horizon"] #root,
+body[data-gm-game="horizon"] #root > div,
+body[data-gm-game="runner"] #root,
+body[data-gm-game="runner"] #root > div,
+body[data-gm-game="runner"] #root > div > div,
+body[data-gm-game="runner"] #root > div > div > div {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+body[data-gm-game="horizon"] canvas,
+body[data-gm-game="runner"] canvas {
+  flex: 1 1 auto;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  touch-action: none !important;
+}
+
+body[data-gm-game="gauntlet"] canvas {
+  height: min(46dvh, 520px) !important;
+}
+
+body[data-gm-game="kart"] {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background: #12110f;
+}
+
+body[data-gm-game="kart"] #about,
+body[data-gm-game="kart"] #foot,
+body[data-gm-game="kart"] #explore,
+body[data-gm-game="saylor"] #about,
+body[data-gm-game="saylor"] #foot,
+body[data-gm-game="saylor"] #explore,
+body[data-gm-game="chop"] #boot-explore {
+  display: none !important;
+}
+
+/* The site header is website chrome. In the app the stage is the screen.
+   main has to grow: #stage's in-flow content is empty (the canvas is
+   absolute), and height:auto with min-height:0 collapses it to 0 unless
+   its parent is a flex column with free space. */
+body[data-gm-game="kart"] #marquee {
+  display: none !important;
+}
+
+body[data-gm-game="kart"] main {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-gm-game="kart"] .aud-toggle {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Lap and time sit at the top-left of the stage. The Games row is
+   fixed there too, so the readouts move down under it. */
+body[data-gm-game="kart"] .hud-lap {
+  top: calc(env(safe-area-inset-top, 0px) + 58px);
+  left: max(14px, env(safe-area-inset-left, 0px));
+}
+
+body[data-gm-game="kart"] .hud-time {
+  top: calc(env(safe-area-inset-top, 0px) + 85px);
+  left: max(14px, env(safe-area-inset-left, 0px));
+}
+
+body[data-gm-game="kart"] #stage {
+  position: absolute;
+  inset: 0;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  border: 0;
+}
+
+body[data-gm-game="saylor"] #qmute button {
+  min-height: 44px;
+}
+
+/* Landscape phone: the site marquee and the music row push the cabinet
+   off the bottom of the screen, and the lives readout sits under Games.
+   The shell mute is the master switch. Music and effects stay in the
+   in-game settings. The cabinet fills whatever is left under the bar. */
+body[data-gm-game="saylor"] {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0 !important;
+}
+
+body[data-gm-game="saylor"] #marquee,
+body[data-gm-game="saylor"] #qmute {
+  display: none !important;
+}
+
+body[data-gm-game="saylor"] #wrap {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+body[data-gm-game="saylor"] .pad .c {
+  font-size: 11px;
+}
+
+body[data-gm-game="chop"] {
+  overflow: hidden;
+  height: 100dvh;
+  touch-action: none;
+}
+
+/* Sats are the top-left readout. Games occupies that corner, so the
+   HUD block starts under the bar. Combo and grade are absolute and
+   do not follow the padding, so they move by the same amount. */
+body[data-gm-game="chop"] #hud {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 60px);
+}
+
+body[data-gm-game="chop"] #hud::before {
+  height: 168px;
+}
+
+body[data-gm-game="chop"] #hud-combo {
+  top: calc(env(safe-area-inset-top, 0px) + 116px);
+}
+
+body[data-gm-game="chop"] #hud-grade {
+  top: calc(env(safe-area-inset-top, 0px) + 150px);
+}

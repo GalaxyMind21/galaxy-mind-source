@@ -1,0 +1,7 @@
+{
+  "description": "Single tweet · launching the /submit self-serve onboarding page",
+  "target": "x",
+  "tweets": [
+    "Tired of vendors DM'ing me \"add me\" with nothing else.\n\ngalaxymind.space/submit — paste your handle, the form pulls the rest from your public profile (Nostr/Lightning).\n\n60 seconds, done.\n\n56 verified Bitcoin vendors. 12 countries. Your turn."
+  ]
+}

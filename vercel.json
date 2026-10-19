@@ -1,0 +1,77 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/check-thresholds",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-stack",
+      "schedule": "5 0 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-treasuries",
+      "schedule": "10 0 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "0 13 * * 0"
+    },
+    {
+      "path": "/api/cron/audit-vendor-activity",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-filings",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-float",
+      "schedule": "15 0 * * *"
+    },
+    {
+      "path": "/api/cron/social-post-drafts",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/list-pending-submissions",
+      "schedule": "30 13 * * *"
+    },
+    {
+      "path": "/api/cron/new-vendor-digest",
+      "schedule": "30 14 * * 0"
+    },
+    {
+      "path": "/api/cron/check-fit-changes",
+      "schedule": "45 13 * * 0"
+    },
+    {
+      "path": "/api/cron/monthly-roundup",
+      "schedule": "0 15 * * 0"
+    },
+    {
+      "path": "/api/cron/weekly-pulse",
+      "schedule": "30 0 * * 1"
+    },
+    {
+      "path": "/api/cron/wen-drop",
+      "schedule": "20 0 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-hashrate",
+      "schedule": "25 0 * * *"
+    },
+    {
+      "path": "/api/cron/monitor-vendors",
+      "schedule": "40 0 * * *"
+    },
+    {
+      "path": "/api/cron/hashrate-available",
+      "schedule": "10 * * * *"
+    },
+    {
+      "path": "/api/cron/rentals-sweep",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

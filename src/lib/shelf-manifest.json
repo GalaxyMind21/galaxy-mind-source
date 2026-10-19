@@ -1,0 +1,770 @@
+{
+  "0x-crypto-goodies": {
+    "src": "/vendor-shelves/0x-crypto-goodies.jpg",
+    "kind": "og",
+    "w": 1000,
+    "h": 525
+  },
+  "100-acres-ranch": {
+    "src": "/vendor-shelves/100-acres-ranch.jpg",
+    "kind": "og",
+    "w": 500,
+    "h": 500
+  },
+  "21-hodl-shop": {
+    "src": "/vendor-shelves/21-hodl-shop.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 628
+  },
+  "21-million": {
+    "src": "/vendor-shelves/21-million.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "33-gamma": {
+    "src": "/vendor-shelves/33-gamma.jpg",
+    "kind": "og",
+    "w": 1256,
+    "h": 1080
+  },
+  "4evr-ink": {
+    "src": "/vendor-shelves/4evr-ink.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "603btc": {
+    "src": "/vendor-shelves/603btc.jpg",
+    "kind": "og",
+    "w": 900,
+    "h": 1200
+  },
+  "admiral-wildlife-services": {
+    "src": "/vendor-shelves/admiral-wildlife-services.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 625
+  },
+  "altair-tech": {
+    "src": "/vendor-shelves/altair-tech.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "atoms": {
+    "src": "/vendor-shelves/atoms.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "become-unruggable": {
+    "src": "/vendor-shelves/become-unruggable.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "beehoney-21": {
+    "src": "/vendor-shelves/beehoney-21.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitaxe-shop": {
+    "src": "/vendor-shelves/bitaxe-shop.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "bitbrand": {
+    "src": "/vendor-shelves/bitbrand.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-art-magazine": {
+    "src": "/vendor-shelves/bitcoin-art-magazine.jpg",
+    "kind": "og",
+    "w": 1201,
+    "h": 631
+  },
+  "bitcoin-art-store": {
+    "src": "/vendor-shelves/bitcoin-art-store.jpg",
+    "kind": "og",
+    "w": 821,
+    "h": 304
+  },
+  "bitcoin-beans": {
+    "src": "/vendor-shelves/bitcoin-beans.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-brabant": {
+    "src": "/vendor-shelves/bitcoin-brabant.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-butlers": {
+    "src": "/vendor-shelves/bitcoin-butlers.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-friendly-sa": {
+    "src": "/vendor-shelves/bitcoin-friendly-sa.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 583
+  },
+  "bitcoin-manor": {
+    "src": "/vendor-shelves/bitcoin-manor.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-museum-art-gallery": {
+    "src": "/vendor-shelves/bitcoin-museum-art-gallery.jpg",
+    "kind": "og",
+    "w": 1260,
+    "h": 630
+  },
+  "bitcoin-park": {
+    "src": "/vendor-shelves/bitcoin-park.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-ranch": {
+    "src": "/vendor-shelves/bitcoin-ranch.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitcoin-trading-cards": {
+    "src": "/vendor-shelves/bitcoin-trading-cards.jpg",
+    "kind": "og",
+    "w": 960,
+    "h": 495
+  },
+  "bitcoinstuffstore": {
+    "src": "/vendor-shelves/bitcoinstuffstore.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 578
+  },
+  "bitlance": {
+    "src": "/vendor-shelves/bitlance.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "bitprint-solutions": {
+    "src": "/vendor-shelves/bitprint-solutions.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "blocksight-live": {
+    "src": "/vendor-shelves/blocksight-live.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "blocktron": {
+    "src": "/vendor-shelves/blocktron.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "born-to-be-free": {
+    "src": "/vendor-shelves/born-to-be-free.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "btc-aloha": {
+    "src": "/vendor-shelves/btc-aloha.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "btc-black-sheep": {
+    "src": "/vendor-shelves/btc-black-sheep.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "btc-og-maxi": {
+    "src": "/vendor-shelves/btc-og-maxi.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 1202
+  },
+  "btc-swag": {
+    "src": "/vendor-shelves/btc-swag.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "club-orange": {
+    "src": "/vendor-shelves/club-orange.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "coin-vigilante": {
+    "src": "/vendor-shelves/coin-vigilante.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "coincards": {
+    "src": "/vendor-shelves/coincards.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "crinkl": {
+    "src": "/vendor-shelves/crinkl.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 686
+  },
+  "cryptocloaks": {
+    "src": "/vendor-shelves/cryptocloaks.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "cryptomachine-shop": {
+    "src": "/vendor-shelves/cryptomachine-shop.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 853
+  },
+  "delgado-s-fuego-l-l-c": {
+    "src": "/vendor-shelves/delgado-s-fuego-l-l-c.jpg",
+    "kind": "shot",
+    "w": 960,
+    "h": 720
+  },
+  "factory-house": {
+    "src": "/vendor-shelves/factory-house.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "faforocks": {
+    "src": "/vendor-shelves/faforocks.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "fbo-developments": {
+    "src": "/vendor-shelves/fbo-developments.jpg",
+    "kind": "og",
+    "w": 1024,
+    "h": 600
+  },
+  "fomo21": {
+    "src": "/vendor-shelves/fomo21.jpg",
+    "kind": "og",
+    "w": 630,
+    "h": 630
+  },
+  "fork-and-coin": {
+    "src": "/vendor-shelves/fork-and-coin.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "foundation": {
+    "src": "/vendor-shelves/foundation.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 672
+  },
+  "fugum": {
+    "src": "/vendor-shelves/fugum.jpg",
+    "kind": "og",
+    "w": 1206,
+    "h": 899
+  },
+  "futurebit": {
+    "src": "/vendor-shelves/futurebit.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "galaxy-mind-hashrate": {
+    "src": "/vendor-shelves/galaxy-mind-hashrate.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "gekkoscience-llc": {
+    "src": "/vendor-shelves/gekkoscience-llc.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "getsound-hsa": {
+    "src": "/vendor-shelves/getsound-hsa.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "gheezer": {
+    "src": "/vendor-shelves/gheezer.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "go-rrr-me": {
+    "src": "/vendor-shelves/go-rrr-me.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 720
+  },
+  "golden-tallow": {
+    "src": "/vendor-shelves/golden-tallow.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "great-ghee-co": {
+    "src": "/vendor-shelves/great-ghee-co.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 843
+  },
+  "homedock": {
+    "src": "/vendor-shelves/homedock.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "isolabellart": {
+    "src": "/vendor-shelves/isolabellart.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "ixtech": {
+    "src": "/vendor-shelves/ixtech.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "karpuz-mining": {
+    "src": "/vendor-shelves/karpuz-mining.jpg",
+    "kind": "og",
+    "w": 1080,
+    "h": 708
+  },
+  "kidwarp": {
+    "src": "/vendor-shelves/kidwarp.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 723
+  },
+  "kriptobr": {
+    "src": "/vendor-shelves/kriptobr.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "lady-laurette": {
+    "src": "/vendor-shelves/lady-laurette.jpg",
+    "kind": "shot",
+    "w": 960,
+    "h": 720
+  },
+  "layer1-studio": {
+    "src": "/vendor-shelves/layer1-studio.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "leathermint": {
+    "src": "/vendor-shelves/leathermint.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 1280
+  },
+  "lightning-bazaar": {
+    "src": "/vendor-shelves/lightning-bazaar.jpg",
+    "kind": "og",
+    "w": 1254,
+    "h": 1254
+  },
+  "lightning-enable": {
+    "src": "/vendor-shelves/lightning-enable.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "lindey-magee": {
+    "src": "/vendor-shelves/lindey-magee.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "ltas-let-s-talk-about-sats": {
+    "src": "/vendor-shelves/ltas-let-s-talk-about-sats.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "mineshop-eu": {
+    "src": "/vendor-shelves/mineshop-eu.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "mx12-art": {
+    "src": "/vendor-shelves/mx12-art.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "nerdminer-store": {
+    "src": "/vendor-shelves/nerdminer-store.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "north-idaho-tallow-co": {
+    "src": "/vendor-shelves/north-idaho-tallow-co.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "nova": {
+    "src": "/vendor-shelves/nova.jpg",
+    "kind": "shot",
+    "w": 800,
+    "h": 600
+  },
+  "onyx-cat-pottery": {
+    "src": "/vendor-shelves/onyx-cat-pottery.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "open-source-miners": {
+    "src": "/vendor-shelves/open-source-miners.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "orange-manufacturing-group": {
+    "src": "/vendor-shelves/orange-manufacturing-group.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "orange-standard": {
+    "src": "/vendor-shelves/orange-standard.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "orangepin21": {
+    "src": "/vendor-shelves/orangepin21.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "oshi": {
+    "src": "/vendor-shelves/oshi.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 600
+  },
+  "panties-for-bitcoin": {
+    "src": "/vendor-shelves/panties-for-bitcoin.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "peony-lane-wine": {
+    "src": "/vendor-shelves/peony-lane-wine.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 628
+  },
+  "permanerd": {
+    "src": "/vendor-shelves/permanerd.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "piratehash": {
+    "src": "/vendor-shelves/piratehash.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "prime-curator-dpyc": {
+    "src": "/vendor-shelves/prime-curator-dpyc.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "proof-of-ink": {
+    "src": "/vendor-shelves/proof-of-ink.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "rehash-heating": {
+    "src": "/vendor-shelves/rehash-heating.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "rigly-block-party": {
+    "src": "/vendor-shelves/rigly-block-party.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 628
+  },
+  "rivermesa": {
+    "src": "/vendor-shelves/rivermesa.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "saifedean-ammous-shop": {
+    "src": "/vendor-shelves/saifedean-ammous-shop.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "salt-of-the-earth": {
+    "src": "/vendor-shelves/salt-of-the-earth.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "sat-s-oil": {
+    "src": "/vendor-shelves/sat-s-oil.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 800
+  },
+  "satoshi-coffee-co": {
+    "src": "/vendor-shelves/satoshi-coffee-co.jpg",
+    "kind": "og",
+    "w": 1000,
+    "h": 444
+  },
+  "satoshoes": {
+    "src": "/vendor-shelves/satoshoes.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "satosphere": {
+    "src": "/vendor-shelves/satosphere.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 854
+  },
+  "satslist": {
+    "src": "/vendor-shelves/satslist.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "satwize": {
+    "src": "/vendor-shelves/satwize.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "scorevivo": {
+    "src": "/vendor-shelves/scorevivo.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "seed-vault-market": {
+    "src": "/vendor-shelves/seed-vault-market.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "seedkeys": {
+    "src": "/vendor-shelves/seedkeys.jpg",
+    "kind": "og",
+    "w": 1034,
+    "h": 1280
+  },
+  "serving-bitcoin": {
+    "src": "/vendor-shelves/serving-bitcoin.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "shamory": {
+    "src": "/vendor-shelves/shamory.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "slingshotvpn": {
+    "src": "/vendor-shelves/slingshotvpn.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "small-batch-steve": {
+    "src": "/vendor-shelves/small-batch-steve.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "snorkel-hot-tubs": {
+    "src": "/vendor-shelves/snorkel-hot-tubs.jpg",
+    "kind": "og",
+    "w": 960,
+    "h": 639
+  },
+  "soap-miner": {
+    "src": "/vendor-shelves/soap-miner.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "solo-satoshi": {
+    "src": "/vendor-shelves/solo-satoshi.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 675
+  },
+  "sport-drink": {
+    "src": "/vendor-shelves/sport-drink.jpg",
+    "kind": "og",
+    "w": 1280,
+    "h": 509
+  },
+  "sweetsats": {
+    "src": "/vendor-shelves/sweetsats.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "the-belief-machine": {
+    "src": "/vendor-shelves/the-belief-machine.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "the-bitcoin-act": {
+    "src": "/vendor-shelves/the-bitcoin-act.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "the-bitcoin-coffee-guy": {
+    "src": "/vendor-shelves/the-bitcoin-coffee-guy.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "the-bitcoin-diaries-fashion": {
+    "src": "/vendor-shelves/the-bitcoin-diaries-fashion.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "the-bitcoin-portal": {
+    "src": "/vendor-shelves/the-bitcoin-portal.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "the-bullish-itcoiner": {
+    "src": "/vendor-shelves/the-bullish-itcoiner.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "the-orange-habit": {
+    "src": "/vendor-shelves/the-orange-habit.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "the-trading-channel": {
+    "src": "/vendor-shelves/the-trading-channel.jpg",
+    "kind": "og",
+    "w": 262,
+    "h": 200
+  },
+  "tonyce": {
+    "src": "/vendor-shelves/tonyce.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "toshi-treasures": {
+    "src": "/vendor-shelves/toshi-treasures.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "trails-coffee": {
+    "src": "/vendor-shelves/trails-coffee.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "turkovich-family-wines": {
+    "src": "/vendor-shelves/turkovich-family-wines.jpg",
+    "kind": "og",
+    "w": 768,
+    "h": 1024
+  },
+  "voltvault": {
+    "src": "/vendor-shelves/voltvault.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "wesatoshis": {
+    "src": "/vendor-shelves/wesatoshis.jpg",
+    "kind": "og",
+    "w": 1000,
+    "h": 1000
+  },
+  "without-rulers": {
+    "src": "/vendor-shelves/without-rulers.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "xxi-wines": {
+    "src": "/vendor-shelves/xxi-wines.jpg",
+    "kind": "og",
+    "w": 1200,
+    "h": 630
+  },
+  "yojimble": {
+    "src": "/vendor-shelves/yojimble.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  },
+  "zalgebar-media": {
+    "src": "/vendor-shelves/zalgebar-media.jpg",
+    "kind": "shot",
+    "w": 1280,
+    "h": 960
+  }
+}

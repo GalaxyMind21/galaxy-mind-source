@@ -1,0 +1,10 @@
+{
+  "description": "Launch thread for The Bitcoin Gauntlet v2 (shipped 2026-07-08): the blind-history daily at /gauntlet + the Runner (now its own page at /runner). Tweet 1 is the hook and works standalone · attach a screenshot of the reveal screen (the mask-off moment with era markers) or your own result grid. Tweet 4 seeds the daily-challenge habit loop. Post manually via the X UI (API creds not provisioned). Cadence suggestion: tweet 1 solo first, full thread next day, then post YOUR daily grid every morning for a week · consistency builds the Wordle-style ritual.",
+  "target": "x",
+  "tweets": [
+    "Everyone believes they would have held.\n\nSo we built a game that checks. You get dropped somewhere in real bitcoin history, dates hidden, and trade eight months blind. Then the mask comes off and you see exactly which top you sold.\n\ngalaxymind.space/gauntlet",
+    "Your opponent is a DCA bot. Same $10,000, same paychecks, same surprise bills. It has no feed, no fear, no opinion · it just buys every payday.\n\nMost runs lose to it. Beating the bot that never thinks is the rarest flex on this site.",
+    "For the reflex crowd there is the Runner: the actual price tape as terrain. Bear markets literally run downhill. Red candles grew into the spikes at their real dates. One tap to jump, instant restart, and the run only ends at the present.\n\nNobody has reached the present.\n\ngalaxymind.space/runner",
+    "One shared hidden window per day, one scored run, streaks, badges, and a spoiler-free grid to post.\n\nGauntlet #1 is live. Bring your conviction · the tape keeps the receipts.\n\ngalaxymind.space/gauntlet"
+  ]
+}

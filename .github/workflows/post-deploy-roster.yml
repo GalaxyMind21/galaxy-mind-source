@@ -1,0 +1,23 @@
+name: post-deploy roster
+
+# After Vercel reports a successful Production deployment, /api/hashrate must list our machines. The listing ids are
+# server-only env (GALAXY_MIND_RIG_IDS); a missing or malformed value shows an empty /hashrate instead of failing the
+# build, so this check fails loudly instead.
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  roster:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: node scripts/check-roster.mjs --url https://galaxymind.space --min 1

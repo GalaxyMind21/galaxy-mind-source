@@ -1,0 +1,889 @@
+/* CHOP · HUD chrome. The game is the canvas; DOM is glass over it. */
+
+/* Two-face type system.
+   CHOP is a static page under its own CSP (connect-src 'self') and does
+   NOT inherit the site's next/font variables. Plus Jakarta Sans / Spline Sans Mono
+   live under /_next/static and are unreachable offline from /chop/ — so
+   we use system stacks that hit the same grotesque / mono split without
+   a webfont request (page must stay offline-playable).
+   Rule: mono for numbers + all-caps chrome; display for every sentence. */
+:root {
+  --chop-display: system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --chop-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Mono", monospace;
+  --accent: #F7931A;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: #050508; }
+body { font-family: var(--chop-display); color: #f5f5f7; touch-action: none; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
+.mono { font-family: var(--chop-mono); }
+
+#stage { position: fixed; inset: 0; }
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ghost finger · a touch-point ring with a comet trail that swipes
+   through the tutorial note. The element is rotated to the swipe angle
+   so the ::after trail always lags the motion. Driven by the Web
+   Animations API from main.js; hidden the moment the player lands the
+   step's first cut. */
+#ghost { position: absolute; left: 0; top: 0; width: 38px; height: 38px;
+  margin: -19px 0 0 -19px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,246,225,0.95) 0%, rgba(255,184,77,0.45) 48%, transparent 72%);
+  border: 2px solid rgba(255,240,210,0.85);
+  box-shadow: 0 0 20px rgba(247,147,26,0.8);
+  opacity: 0; pointer-events: none; z-index: 4; }
+#ghost::after { content: ""; position: absolute; right: 100%; top: 50%;
+  width: 74px; height: 10px; margin-top: -5px; border-radius: 5px;
+  background: linear-gradient(90deg, transparent, rgba(255,200,110,0.7)); }
+
+/* opening ceremony · the lead-in. Sits in the upper band like the
+   teach card so it never covers the corridor; every element is
+   beat-driven from JS, so nothing here animates on a wall clock. */
+#intro { position: absolute; left: 0; right: 0; top: 21%; text-align: center;
+  pointer-events: none; z-index: 5; }
+#intro-line { font-family: var(--chop-mono);
+  font-size: 12.5px; line-height: 1.9; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,210,138,0.9); opacity: 0; transition: opacity 0.5s ease;
+  text-shadow: 0 0 18px rgba(247,147,26,0.5); white-space: pre-line; }
+#intro-line.on { opacity: 1; }
+#intro-count { margin-top: 14px; font-family: var(--chop-mono);
+  font-size: 62px; font-weight: 800; letter-spacing: 0.04em; line-height: 1;
+  color: #ffe4b8; opacity: 0;
+  text-shadow: 0 0 34px rgba(247,147,26,0.75), 0 2px 0 rgba(5,5,8,0.9);
+  font-variant-numeric: tabular-nums; }
+#intro-count.beat { animation: introbeat 0.42s ease-out; }
+@keyframes introbeat {
+  0%   { opacity: 1; transform: scale(1.5); }
+  22%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.94); }
+}
+
+/* drop-downbeat flash · warm radial exhale centred on the strike plane */
+#flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 3;
+  background: radial-gradient(ellipse at 50% 60%, rgba(255,222,168,0.85), rgba(247,147,26,0.32) 42%, transparent 72%); }
+#flash.on { animation: dropflash 0.6s ease-out; }
+@keyframes dropflash { 0% { opacity: 0.8; } 100% { opacity: 0; } }
+
+/* ── HUD ── */
+#hud { position: absolute; inset: 0; pointer-events: none; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px calc(env(safe-area-inset-bottom, 0px) + 12px); display: flex; flex-direction: column; }
+/* top scrim · seats the readouts on glass instead of raw scene. Kept to
+   the top 96px so the play space below stays untouched. */
+#hud::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 96px;
+  background: linear-gradient(rgba(5,5,8,0.68), transparent); pointer-events: none; }
+/* bottom vignette · settles the floor grid under the progress readout so
+   the foreground fades out instead of running flat into the HUD zone */
+#hud::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 130px;
+  background: linear-gradient(transparent, rgba(5,5,8,0.7)); pointer-events: none; }
+#hud-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+#hud-sats { font-size: 19px; opacity: 0.85; font-weight: 700; letter-spacing: 0.02em; color: #ffb84d; text-shadow: 0 0 18px rgba(247,147,26,0.55); font-variant-numeric: tabular-nums; }
+#hud-sats .unit { font-size: 12px; color: rgba(255,184,77,0.85); letter-spacing: 0.2em; }
+/* metadata, not score — must not carry the same visual weight as sats */
+/* padding-right clears the pause disc. Without it the disc sits ON the
+   block line — a panel judge caught "F2POOL" with its OO hidden behind
+   the button. The pause chip is 44px min-width + 12px inset, so 62px of
+   gutter plus the disc's own ring. */
+#hud-block { font-size: 12px; letter-spacing: 0.1em; color: rgba(245,245,247,0.72); /* r17: 55% was a notch too dim for outdoor mobile */ text-align: right; text-transform: uppercase; padding-right: 62px; white-space: pre-line; line-height: 1.25; }
+/* combo docks under sats — never floats centre competing with the strike plane */
+#hud-combo {
+  position: absolute;
+  /* 42px parked the pill on top of the sats unit line (measured: sats
+     block spans y 14-65, pill landed at y 42 — the "s a×39" collision a
+     panel judge flagged). 70px clears the full sats block. */
+  top: calc(env(safe-area-inset-top, 0px) + 70px);
+  left: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffb84d;
+  opacity: 0;
+  letter-spacing: 0.04em;
+  /* pill, not floating glyphs — gives the multiplier its own surface so
+     it stops colliding with the sats baseline above it */
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(247,147,26,0.28);
+  border-radius: 999px;
+  padding: 3px 12px;
+  text-shadow: 0 1px 0 #050508, 0 0 12px rgba(247,147,26,0.45);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  transform: scale(0.92);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+#hud-combo.on { opacity: 0.92; transform: scale(1); }
+/* per-increment pop · restarted from JS on every cut */
+#hud-combo.tick { animation: combopop 0.22s ease-out; }
+@keyframes combopop { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
+/* streak escalation · ×25 glow → ×50 gold fill → ×100 halo */
+#hud-combo.t1 { border-color: rgba(247,147,26,0.65); box-shadow: 0 0 12px rgba(247,147,26,0.35); }
+#hud-combo.t2 { border-color: rgba(255,210,138,0.8); background: rgba(247,147,26,0.18); color: #ffd9a0; box-shadow: 0 0 16px rgba(247,147,26,0.5); }
+#hud-combo.t3 { border-color: #ffd9a0; background: rgba(247,147,26,0.3); color: #fff1d6; box-shadow: 0 0 26px rgba(247,147,26,0.75), inset 0 0 10px rgba(255,210,138,0.35); }
+/* live grade · same left edge as combo, quieter sibling under it.
+   S.earned/S.maxScore was only on the clear card (panel round 2 info
+   density). Smaller/quieter so it never competes with the combo pill. */
+#hud-grade {
+  position: absolute;
+  /* combo top is 70px · pill ~28px tall · 6px gap */
+  top: calc(env(safe-area-inset-top, 0px) + 104px);
+  left: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 210, 138, 0.78);
+  opacity: 0;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(247,147,26,0.16);
+  border-radius: 999px;
+  padding: 2px 9px;
+  text-shadow: 0 1px 0 #050508;
+  transition: opacity 0.18s ease;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+#hud-grade.on { opacity: 0.78; }
+/* raised off the home-indicator band (panel: breathing room) · z-index 1
+   keeps both readouts above the #hud::after vignette, which as a pseudo
+   paints after (over) them in tree order otherwise */
+/* r13: 4px track + 25% instrument ticks; fill gradient untouched */
+/* BLOCK INTEGRITY · the health bar, BELOW the tx progress strip (it is
+   at +28, progress at +42 — nearest the thumb, and the one the eye must
+   find in a panic). Distinct from progress on three axes at once: taller
+   (6px vs 4), a bordered vessel (progress is a bare strip), and an ember
+   fill vs progress's bright accent gradient. Amber while healthy — the
+   bar is YOUR stake in the verb — steel-blue pulse in danger, because
+   failure never borrows the reward colour. */
+#hud-integrity {
+  position: absolute; z-index: 1; left: 16px; right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
+  height: 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(247,147,26,0.22);
+}
+#hud-integrity-fill {
+  height: 100%; width: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #c87f2a, #ffb84d);
+  box-shadow: 0 0 12px rgba(247,147,26,0.4);
+  transition: width 0.25s ease;
+}
+#hud-integrity.danger { border-color: rgba(143,163,184,0.4); }
+#hud-integrity.danger #hud-integrity-fill {
+  background: linear-gradient(90deg, #5a7086, #8fa3b8);
+  box-shadow: 0 0 14px rgba(143,163,184,0.55);
+  animation: integrityPulse 0.7s ease-in-out infinite;
+}
+@keyframes integrityPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { #hud-integrity.danger #hud-integrity-fill { animation: none; } }
+#hud.run-over #hud-integrity { visibility: hidden; opacity: 0; }
+
+#hud-progress {
+  position: absolute; z-index: 1; left: 16px; right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 42px); height: 4px;
+  background:
+    linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.08)),
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px),
+      rgba(255,255,255,0.22) calc(25% - 1px) 25%);
+  border-radius: 2px; overflow: hidden;
+}
+#hud-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #F7931A, #ffd9a0); border-radius: 2px; transition: width 0.3s ease; box-shadow: 0 0 18px rgba(247,147,26,0.7); filter: brightness(1.15); }
+#hud-txcount { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 50px); font-size: 12px; letter-spacing: 0.14em; color: rgba(255,225,180,0.92); text-align: center; text-transform: uppercase; }
+/* the tx drain reacts HERE instead of flying its own pop over the notes */
+#hud-txcount.tick { animation: txtick 0.26s ease-out; }
+@keyframes txtick {
+  0% { color: #ffd9a0; text-shadow: 0 0 14px rgba(247,147,26,0.8); }
+  100% { color: rgba(255,225,180,0.92); text-shadow: none; }
+}
+/* clear card is up · the semi-transparent ceremony scrim lets the live
+   HUD bleed through (stale "N TX LEFT" + progress bar under a finished
+   run). Kill the in-run chrome; restore on NEXT BLOCK. */
+#hud.run-over #hud-txcount,
+#hud.run-over #hud-progress,
+#hud.run-over #hud-combo,
+#hud.run-over #hud-grade,
+/* the combo tower too — the coinbase cut always seals mid-chain, so
+   without this a giant translucent numeral hangs behind the ceremony
+   card (review r2 finding; the scrim is semi-transparent by design) */
+#hud.run-over #combo-big { visibility: hidden; opacity: 0; }
+
+/* praise · timing-streak reinforcement. Its own slot well above the
+   score pops so encouragement and payout never stack into one blob. */
+#praise { position: absolute; left: 0; right: 0; top: 38%; text-align: center;
+  font-size: 27px; font-weight: 800; letter-spacing: 0.16em;
+  color: #fff1d6; opacity: 0; pointer-events: none; z-index: 3;
+  text-shadow: 0 0 10px rgba(5,5,8,0.9), 0 0 30px rgba(247,147,26,0.8); }
+#praise.on { animation: praisepop 0.9s ease-out; }
+@keyframes praisepop {
+  0%   { opacity: 0; transform: scale(0.7); }
+  14%  { opacity: 1; transform: scale(1.06); }
+  60%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* score pops · pooled · 2px dark outline so they survive over bright halves */
+#pops { position: absolute; inset: 0; }
+.pop {
+  position: absolute;
+  font-family: var(--chop-mono);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  /* HUD voice, not stock game-text: the hard black stroke was the one
+     off-system element in the type system (panel round 5). A soft
+     additive glow does the separation work instead. Normal hits sit
+     dimmer amber; PERFECT/gold tiers brighten above them. */
+  /* FULL-value amber, independent of scene light — my "dimmer amber for
+     normal hits" tiering rendered dark olive over the sky and made the
+     reward illegible at the moment it fired (panel round 6). Magnitude
+     tiers by SIZE and glow, never by darkening the colour. */
+  color: #ffb84d;
+  /* r13: guaranteed-contrast soft dark halo FIRST (not a hard stroke),
+     then the existing glow layers for separation over bright halves */
+  text-shadow:
+    0 0 7px rgba(5,5,8,0.95), 0 1px 2px rgba(5,5,8,0.9),
+    0 1px 8px rgba(5,5,8,0.95), 0 0 16px rgba(247,147,26,0.65);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  z-index: 2;
+}
+.pop.big {
+  font-size: 18px;
+  color: #ffe4b8; /* white-hot tier for PERFECT — still never pure white */
+  text-shadow:
+    0 0 7px rgba(5,5,8,0.95), 0 1px 2px rgba(5,5,8,0.9),
+    0 1px 8px rgba(5,5,8,0.9), 0 0 18px rgba(247,147,26,0.7);
+}
+/* >10k payout · gold gradient face + scale + punch-in — big hits look
+   big in a STILL, not just in motion */
+.pop.gold {
+  font-size: 21px;
+  background: linear-gradient(180deg, #fff1d6, #ffd28a 55%, #F7931A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 0 #050508) drop-shadow(0 0 12px rgba(247,147,26,0.65));
+}
+.pop.gold.on { animation: popfly 0.75s ease-out forwards, goldpunch 0.16s ease-out; }
+/* NAILED · the dead-centre-of-the-beat celebration: biggest type, white-hot
+   flash punching through the gold — the one label that means you were
+   exactly on the music */
+.pop.nail {
+  font-size: 25px;
+  letter-spacing: 0.1em;
+  filter: drop-shadow(0 2px 0 #050508) drop-shadow(0 0 18px rgba(255,220,150,0.9));
+}
+.pop.nail.on { animation: popfly 0.8s ease-out forwards, nailpunch 0.22s ease-out; }
+@keyframes nailpunch {
+  0% { scale: 1.5; filter: drop-shadow(0 0 26px rgba(255,255,255,0.95)) brightness(1.6); }
+  100% { scale: 1; }
+}
+@keyframes goldpunch { 0% { scale: 1.35; } 100% { scale: 1; } }
+/* aging · a filter, so it never fights the flight animation. Newest pop
+   is full intensity; anything older reads as "a beat ago". */
+.pop.aged { filter: brightness(0.5) saturate(0.65); }
+.pop.on { animation: popfly 0.75s ease-out forwards; }
+/* Snap in, HOLD, then fade. The old curve peaked at 14% and spent the
+   remaining 640ms fading — so for most of its life the judgement read at
+   half strength, and any still (or the player's own glance, which lands
+   ~100-300ms after the cut) caught it already dying. The reward holds
+   full weight through the half-life, then gets out of the way. */
+@keyframes popfly {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  8% { opacity: 1; transform: translate(-50%, -66%) scale(1.08); }
+  55% { opacity: 1; transform: translate(-50%, -104%) scale(1.0); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scale(0.96); }
+}
+
+/* ── boot overlay ── */
+/* z-index 10 sat ABOVE #hud, but the HUD's own children paint into the
+   same stacking context — the score and block line ghosted through the
+   boot card on every first load. The overlay owns the screen now. */
+#boot { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 42%, rgba(247,147,26,0.10), rgba(5,5,8,0.82) 55%, rgba(5,5,8,1)); backdrop-filter: blur(3px); transition: opacity 0.5s ease, visibility 0s linear; z-index: 10; }
+/* visibility, not just opacity+pointer-events: the card's buttons carry
+   their own pointer-events:auto, which RE-ENABLES them through a
+   parent's none — an invisible CHOP button stayed tappable over live
+   play. visibility:hidden kills hit-testing for the whole subtree; the
+   delayed flip preserves the fade-out. Same fix on #pause and #clear —
+   the operator's "the pleb button is dead" was the hidden settings
+   menu's RESET TIMING chip eating taps over the boot card. */
+#boot.gone { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.5s ease, visibility 0s linear 0.5s; }
+#boot-card { text-align: center; padding: 28px 30px; max-width: 340px; }
+.boot-eyebrow { font-size: 12px; letter-spacing: 0.28em; color: rgba(245,245,247,0.7); }
+#boot-card h1 { font-size: 74px; font-weight: 900; letter-spacing: 0.06em; margin: 6px 0 10px; background: linear-gradient(180deg, #ffd9a0, #F7931A 60%, #b35f00); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 26px rgba(247,147,26,0.45)); }
+#boot-block { font-size: 13px; letter-spacing: 0.1em; color: #ffb84d; min-height: 18px; }
+/* Sentences · display face, tight measure, balanced wrap. Centred mono
+   prose left orphans ("more." alone on a line) and read as a console
+   dump; balance + ~36ch is the phone-width fix (430 / 390 / 360). */
+.boot-pitch {
+  font-family: var(--chop-display);
+  font-size: 14px; line-height: 1.4; letter-spacing: 0;
+  color: rgba(245,245,247,0.9); margin: 14px auto 16px; max-width: 36ch;
+  text-wrap: pretty; /* progressive fallback · older engines */
+  text-wrap: balance;
+}
+
+/* fee legend · shows what note brightness means instead of only saying it */
+#boot-legend { display: flex; justify-content: center; gap: 18px; margin: 0 0 20px; }
+.legend-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.legend-chip { width: 26px; height: 26px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25); }
+.legend-chip.dust { background: #8fa3b8; }
+.legend-chip.mid { background: #c8863a; }
+.legend-chip.whale { background: #ffd28a; box-shadow: 0 0 14px rgba(255,210,138,0.7); }
+.legend-label { font-size: 12px; letter-spacing: 0.08em; color: rgba(245,245,247,0.75); }
+/* difficulty chips · PLEB / HODLER / MAXI */
+#boot-diff { display: flex; justify-content: center; gap: 10px; margin: 0 0 14px; }
+.diff-chip { pointer-events: auto; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; padding: 8px 16px; color: rgba(245,245,247,0.75); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; cursor: pointer; transition: all 0.15s ease; }
+.diff-chip.sel { color: #050508; background: linear-gradient(180deg, #ffc46b, #F7931A); border-color: transparent; box-shadow: 0 0 16px rgba(247,147,26,0.4); }
+/* sentence under the chips · display face, not mono chrome */
+#boot-diff-desc {
+  font-family: var(--chop-display);
+  font-size: 13px; line-height: 1.4; letter-spacing: 0;
+  color: rgba(245,245,247,0.65); margin: -6px auto 14px; min-height: 15px;
+  max-width: 34ch; text-wrap: pretty; text-wrap: balance;
+}
+#boot-rec {
+  font-family: var(--chop-display);
+  font-size: 13px; line-height: 1.4; letter-spacing: 0;
+  color: #ffb84d; margin: -6px auto 12px; max-width: 36ch;
+  text-wrap: pretty; text-wrap: balance;
+}
+#boot-rec.hidden { display: none; }
+#boot-start { pointer-events: auto; font-size: 16px; font-weight: 800; letter-spacing: 0.22em; padding: 15px 44px; color: #050508; background: linear-gradient(180deg, #ffc46b, #F7931A); border: none; border-radius: 14px; box-shadow: 0 0 34px rgba(247,147,26,0.5), inset 0 1px 0 rgba(255,255,255,0.35); cursor: pointer; transition: transform 0.12s ease; }
+#boot-start:active { transform: scale(0.96); }
+/* was one cramped 2-line run of "headphones recommended · this block
+   chose "Ascend" · 127 BPM" with straight quotes — a debug dump under
+   the CTA. Now a quiet two-line caption with room to breathe. */
+.boot-hint { font-size: 11px; line-height: 1.8; letter-spacing: 0.1em;
+  color: rgba(245,245,247,0.6); margin-top: 18px; }
+.boot-hint b { display: block; font-weight: 400; color: rgba(255,210,138,0.85); }
+/* secondary game button · chip language, clearly under the primary CTA.
+   Was an underlined text link and read as an HTML anchor. */
+#boot-tut {
+  pointer-events: auto; display: inline-block;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+  padding: 8px 18px; margin-top: 14px;
+  color: rgba(245,245,247,0.72);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+#boot-tut:active { transform: scale(0.97); }
+
+/* tutorial chrome · skip always visible, step line via #teach */
+#tut-skip { position: absolute; right: 16px; top: calc(env(safe-area-inset-top, 0px) + 52px); /* ABOVE the teach gate (z 11) — at z 4 the full-screen gate ate every tap,
+   so the one control that says "get me out of the walkthrough" was dead for
+   exactly the cards a trapped player wants out of (review r2, P1-1). Only
+   safe because tutEnd now restarts the clock + pause chip when it closes a
+   gate — raising this without that fix ships a first-session softlock. */
+  z-index: 12; pointer-events: auto; font-size: 12px; letter-spacing: 0.16em; color: rgba(245,245,247,0.75); background: rgba(12,12,18,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 999px; padding: 7px 16px; cursor: pointer; }
+#tut-skip.hidden { display: none; }
+
+/* pause chip · top-right bezel, above the skip row, outside the lane
+   column. Min 44px hit target, quiet face so it never reads as a note. */
+#btn-pause {
+  position: absolute;
+  right: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  z-index: 6;
+  pointer-events: auto;
+  min-width: 44px; min-height: 44px;
+  padding: 0 12px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.18em;
+  color: rgba(245,245,247,0.7);
+  background: rgba(12,12,18,0.55);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  cursor: pointer;
+}
+#btn-pause:active { transform: scale(0.96); }
+#btn-pause.hidden { display: none; }
+/* skip drops under the pause chip so they never stack */
+#tut-skip { top: calc(env(safe-area-inset-top, 0px) + 58px); }
+
+/* ── pause / settings menu ── */
+#pause {
+  position: absolute; inset: 0; z-index: 12;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5,5,8,0.72);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: opacity 0.25s ease, visibility 0s linear;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+#pause.hidden { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.25s ease, visibility 0s linear 0.25s; }
+#pause-card {
+  text-align: center; padding: 22px 24px 20px;
+  background: rgba(12,12,18,0.88);
+  border: 1px solid rgba(247,147,26,0.35);
+  border-radius: 18px;
+  box-shadow: 0 0 48px rgba(247,147,26,0.2), inset 0 0 0 1px rgba(247,147,26,0.12);
+  max-width: 360px; width: 100%;
+  margin: auto;
+}
+#pause-actions {
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+  margin: 14px 0 18px;
+}
+#pause-resume {
+  pointer-events: auto; font-size: 15px; font-weight: 800; letter-spacing: 0.2em;
+  padding: 14px 28px; color: #050508;
+  background: linear-gradient(180deg, #ffc46b, #F7931A);
+  border: none; border-radius: 12px;
+  box-shadow: 0 0 26px rgba(247,147,26,0.45); cursor: pointer;
+}
+#pause-resume:active { transform: scale(0.97); }
+.menu-secondary {
+  pointer-events: auto;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+  padding: 10px 18px;
+  color: rgba(245,245,247,0.78);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px; cursor: pointer;
+}
+.menu-secondary:active { transform: scale(0.97); }
+.menu-chip {
+  pointer-events: auto;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  padding: 6px 12px; margin: 4px 0 10px;
+  color: rgba(245,245,247,0.7);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px; cursor: pointer;
+}
+/* boot SETTINGS · same secondary chip language as HOW TO PLAY */
+#boot-settings {
+  pointer-events: auto; display: inline-block;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+  padding: 8px 18px; margin-top: 10px; margin-left: 8px;
+  color: rgba(245,245,247,0.72);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px; cursor: pointer;
+}
+#boot-settings:active { transform: scale(0.97); }
+
+/* crawlable exits · see the markup comment in index.html. Deliberately
+   the quietest thing on the card: smaller than the chips, under them,
+   half-opacity, so the eye still finishes on CHOP → and not on a way
+   to leave. touch-action:auto because body sets none for the game and
+   a link that cannot be tapped is not a link. */
+#boot-explore {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  /* The 10px of padding each link carries below is hit box, not
+     spacing, so the margin/gap give it back to keep the card's rhythm
+     identical to the chip row above. */
+  gap: 2px 4px; margin-top: 10px;
+}
+#boot-explore a {
+  pointer-events: auto; touch-action: auto;
+  font-family: var(--chop-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(245,245,247,0.42); text-decoration: none;
+  /* 10px column of padding above the text, none of it visible: a
+     10px-tall line of type is a 15px tap target on the phone this
+     game is played on. The underline stays put because the padding
+     is all on the leading edge. */
+  padding: 10px 6px 2px;
+  border-bottom: 1px solid rgba(245,245,247,0.16);
+  transition: color 0.15s, border-color 0.15s;
+}
+#boot-explore a:hover {
+  color: rgba(255,210,138,0.9);
+  border-bottom-color: rgba(255,210,138,0.5);
+}
+
+/* settings block · lives inside the pause card (and boot settings-only) */
+#settings {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 14px; margin-top: 4px;
+  text-align: left;
+}
+.settings-title {
+  font-size: 11px; letter-spacing: 0.22em; text-align: center;
+  color: rgba(245,245,247,0.55); margin-bottom: 12px;
+}
+.set-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin: 8px 0;
+}
+.set-row-stack { flex-direction: column; align-items: stretch; gap: 8px; }
+.set-label {
+  font-family: var(--chop-display);
+  font-size: 13px; color: rgba(245,245,247,0.82);
+}
+.set-value {
+  font-size: 12px; letter-spacing: 0.06em;
+  color: #ffb84d; font-variant-numeric: tabular-nums;
+}
+.set-hint {
+  font-family: var(--chop-display);
+  font-size: 12px; line-height: 1.35;
+  color: rgba(245,245,247,0.55);
+  margin: -2px 0 8px;
+}
+.set-toggle {
+  min-width: 64px; padding: 6px 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  color: rgba(245,245,247,0.8);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px; cursor: pointer;
+}
+.set-toggle.on {
+  color: #050508;
+  background: linear-gradient(180deg, #ffc46b, #F7931A);
+  border-color: transparent;
+}
+#set-lat {
+  width: 100%; margin: 4px 0 2px;
+  accent-color: var(--accent);
+}
+#pause-diff { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+/* music attribution · quiet, permanent, and legally load-bearing */
+#music-credits { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+#music-credits .credit-line {
+  font-size: 11px; line-height: 1.5; color: rgba(245,245,247,0.5);
+  margin-top: 4px;
+}
+/* settings-only mode (opened from boot) · hide run actions, show CLOSE */
+#pause.settings-only #pause-actions { display: none; }
+#pause.settings-only #pause-close { display: inline-block; margin-top: 14px; }
+#pause-close.hidden { display: none; }
+
+/* ── stage clear ── */
+#clear { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(5,5,8,0.55); z-index: 9; transition: opacity 0.4s ease, visibility 0s linear; }
+#clear.hidden { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.4s ease, visibility 0s linear 0.4s; }
+/* glass over the world, not a rectangle painted on it (panel round 9):
+   backdrop blur + an inner amber hairline separate the card's edge from
+   the dark scene behind it */
+#clear-card { text-align: center; padding: 26px 30px; background: rgba(12,12,18,0.72); border: 1px solid rgba(247,147,26,0.35); border-radius: 18px; backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); box-shadow: 0 0 60px rgba(247,147,26,0.25), inset 0 0 0 1px rgba(247,147,26,0.14); max-width: 360px; }
+/* the second read · big grade under the eyebrow */
+#clear-grade { font-size: 30px; font-weight: 800; letter-spacing: 0.06em; margin: 10px 0 2px; background: linear-gradient(180deg, #ffd9a0, #F7931A); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+/* clear-stats · built as DOM children in sealBlock (no innerHTML).
+   Prose (flavor) is display; NEW BEST / BEST / numeric lines stay mono. */
+#clear-stats {
+  font-family: var(--chop-display);
+  font-size: 13px; line-height: 1.45; letter-spacing: 0;
+  color: rgba(245,245,247,0.72); margin: 6px 0 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+#clear-stats .clear-flavor {
+  color: rgba(255,210,138,0.92);
+  max-width: 34ch; text-wrap: pretty; text-wrap: balance;
+  margin-bottom: 4px;
+}
+#clear-stats .clear-best {
+  font-family: var(--chop-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(245,245,247,0.55); margin-bottom: 2px;
+}
+#clear-stats .clear-best.is-new {
+  color: #ffb84d;
+  text-shadow: 0 0 14px rgba(247,147,26,0.55);
+}
+#clear-stats .clear-stat {
+  font-family: var(--chop-mono); font-size: 12px;
+  letter-spacing: 0.06em; line-height: 1.7;
+  color: rgba(245,245,247,0.7); font-variant-numeric: tabular-nums;
+}
+/* the block fact · one true, gated sentence about the block just sealed.
+   Display face, not mono: it is prose, and the mono stat lines above it
+   are the numbers it is meant to feel different from. Set off by a rule
+   so the card reads as scoreboard-then-newspaper rather than one list. */
+#clear-stats .clear-fact {
+  font-family: var(--chop-display);
+  font-size: 13px; line-height: 1.5; letter-spacing: 0;
+  color: rgba(255,225,180,0.9);
+  max-width: 36ch; text-wrap: pretty; text-wrap: balance;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid rgba(247,147,26,0.18);
+}
+/* the secondary never competes with the primary — same voice, less ink,
+   and no second rule (one divider, not a ladder) */
+#clear-stats .clear-fact.is-quiet {
+  color: rgba(245,245,247,0.6); font-size: 12px;
+  margin-top: 5px; padding-top: 0; border-top: none;
+}
+
+/* today's board on the ceremony card · the run goes somewhere.
+   Rows are DOM nodes so the player's line can carry .me. */
+#clear-board {
+  font-size: 11px; line-height: 1.85; letter-spacing: 0.08em;
+  color: rgba(255,210,138,0.85); margin: 0 0 16px; min-height: 14px;
+  font-variant-numeric: tabular-nums;
+  display: flex; flex-direction: column; align-items: stretch; gap: 2px;
+}
+#clear-board .board-title {
+  letter-spacing: 0.14em; margin-bottom: 4px;
+  color: rgba(245,245,247,0.55);
+}
+#clear-board .board-row {
+  padding: 2px 10px; border-radius: 6px;
+  text-align: left;
+}
+/* the player's own rank · readable at a glance without a "YOU" rewrite */
+#clear-board .board-row.me {
+  color: #fff1d6;
+  background: rgba(247,147,26,0.14);
+  box-shadow: inset 0 0 0 1px rgba(247,147,26,0.4);
+}
+#clear-share {
+  display: block; width: 100%; max-width: 280px; margin: 0 auto 10px;
+  pointer-events: auto;
+}
+#clear-next { pointer-events: auto; font-size: 14px; font-weight: 800; letter-spacing: 0.2em; padding: 13px 34px; color: #050508; background: linear-gradient(180deg, #ffc46b, #F7931A); border: none; border-radius: 12px; box-shadow: 0 0 26px rgba(247,147,26,0.45); cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pop.on { animation-duration: 0.3s; }
+}
+
+/* the teacher · tutorial steps and one-shot moments.
+   NOT a browser-notification card (1px amber border + glass was that
+   signal). Soft radial scrim that dies at the edges; type carries it.
+   No backdrop-filter — this is on-screen during play and blur is a
+   per-frame GPU cost on iOS. Text-shadow keeps the line legible over
+   both the dark sky and the bright orange floor. */
+#teach {
+  position: absolute; left: 50%;
+  /* SAFE-AREA COORDINATES, NOT PERCENT. This was `top: 16%` while
+     #hud-combo and #hud-grade sit at calc(env(safe-area-inset-top) + N).
+     Those two systems only agree when the inset is ZERO — i.e. in a
+     desktop browser, which is where all of this game's QA had ever been
+     done. Measured on the real geometry: at inset 0 the card cleared the
+     grade chip by 17px; at inset 47 (iPhone 14) it overlapped it by
+     1,121px^2, and at inset 59 (14 Pro Max) by 1,736px^2. That is the
+     "text overlapping" the operator saw on hardware and no capture here
+     could ever show. Anchoring to the same origin as the chrome it must
+     clear makes the gap constant on every device. */
+  top: calc(env(safe-area-inset-top, 0px) + 136px);
+  transform: translate(-50%, 0) translateY(10px);
+  width: max-content; max-width: min(36ch, 84vw);
+  padding: 16px 26px;
+  font-family: var(--chop-display);
+  font-size: 15px; line-height: 1.4; letter-spacing: 0;
+  color: #fff1d6; text-align: center;
+  text-wrap: pretty; text-wrap: balance;
+  /* soft dark pool · dense centre, transparent rim (no hard edge) */
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(5,5,8,0.82) 0%,
+    rgba(5,5,8,0.62) 55%,
+    rgba(5,5,8,0) 100%);
+  border: none; border-radius: 0;
+  /* warm lift so the line doesn't die on the black sky */
+  text-shadow:
+    0 1px 2px rgba(5,5,8,0.95),
+    0 0 18px rgba(5,5,8,0.9),
+    0 0 28px rgba(247,147,26,0.25);
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+#teach.on { opacity: 1; transform: translate(-50%, 0) translateY(0); }
+@media (prefers-reduced-motion: reduce) { #teach { transition: opacity 0.35s ease; } }
+
+/* Photo mode (QA) · __CHOP.freeze() stops rAF but CSS animations ride the
+   compositor clock and kept playing — every captured still showed a cut
+   with its score pop already faded. Pausing (not hiding) keeps the frozen
+   frame honest to what a player perceives at that instant. */
+body.gm-frozen #hud *,
+body.gm-frozen #pops *,
+body.gm-frozen #praise,
+body.gm-frozen #flash {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+/* ── teach gate · the stop-and-read surface ─────────────────────────
+   #teach is a line that lives over live play. This is the opposite: a
+   card the run WAITS for. Used only for beats the player must act on
+   (what the game is, what a direction arrow means, the block premise),
+   because instructions delivered over moving traffic are not read.
+   Rides the real pause path — see teachPause() in main.js. */
+#teachgate {
+  position: absolute; inset: 0; z-index: 11;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at 50% 45%,
+    rgba(5,5,8,0.72) 0%, rgba(5,5,8,0.9) 60%, rgba(5,5,8,0.96) 100%);
+  pointer-events: auto;
+  transition: opacity 0.25s ease;
+}
+#teachgate.hidden { display: none; }
+#teachgate-card {
+  max-width: min(40ch, 88vw); text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
+#teachgate-eyebrow {
+  font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(247,147,26,0.85);
+}
+#teachgate-eyebrow:empty { display: none; }
+#teachgate-text {
+  font-family: var(--chop-display);
+  font-size: 19px; line-height: 1.45; color: #fff1d6;
+  text-wrap: pretty; text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(5,5,8,0.95), 0 0 24px rgba(247,147,26,0.2);
+}
+#teachgate-go {
+  margin-top: 4px;
+  font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: #050508; background: var(--chop-accent, #F7931A);
+  border: none; border-radius: 999px; padding: 12px 26px;
+  cursor: pointer; font-weight: 700;
+  box-shadow: 0 0 22px rgba(247,147,26,0.45);
+}
+#teachgate-go:active { transform: scale(0.97); }
+
+/* ── failure feedback ───────────────────────────────────────────────
+   Steel-blue, never orange: the palette contract reserves warm for the
+   verb and everything that rewards it, so a failure that flashed amber
+   would read as a small win. Edge vignette rather than a full wash so it
+   never hides the lane the player is about to need. */
+#missflash {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  opacity: 0; box-shadow: inset 0 0 90px 26px rgba(143,163,184,0.55);
+}
+#missflash.on { animation: misspulse 0.32s ease-out; }
+#missflash.hard { animation: misspulse 0.5s ease-out; }
+#missflash.hard { box-shadow: inset 0 0 130px 40px rgba(143,163,184,0.75); }
+@keyframes misspulse {
+  0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; }
+}
+
+/* streak milestone · the pill itself announces the tier it just crossed.
+   Distinct from .tick (every cut) — this only fires on 8/16/32/64. */
+#hud-combo.milestone { animation: combomile 0.55s cubic-bezier(0.2,0.9,0.2,1); }
+@keyframes combomile {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,147,26,0.85); }
+  35%  { transform: scale(1.42); box-shadow: 0 0 26px 10px rgba(247,147,26,0.6); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,147,26,0); }
+}
+/* streak broken · the pill visibly falls over rather than just vanishing.
+   A combo that silently stops existing gives the player nothing to learn
+   from; this makes the loss an event with a location on screen. */
+#hud-combo.broke {
+  animation: combobreak 0.42s ease-in forwards;
+  border-color: rgba(143,163,184,0.8) !important;
+  background: rgba(143,163,184,0.16) !important;
+  color: #c8d4e0 !important;
+  box-shadow: none !important;
+}
+@keyframes combobreak {
+  0%   { opacity: 0.92; transform: scale(1) rotate(0deg); }
+  25%  { opacity: 1;    transform: scale(1.1) rotate(-3deg); }
+  100% { opacity: 0;    transform: scale(0.82) translateY(16px) rotate(-9deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hud-combo.milestone, #hud-combo.broke { animation: none; }
+  #missflash.on, #missflash.hard { animation: missfade 0.3s ease-out; }
+  @keyframes missfade { 0%,100% { opacity: 0; } 30% { opacity: 0.85; } }
+}
+body.gm-frozen #missflash, body.gm-frozen #teachgate {
+  animation-play-state: paused !important;
+}
+
+/* ── DDR combo tower ─────────────────────────────────────────────────
+   A nine-year-old playtester's favourite part of the game was the combo,
+   so it gets to be the trophy it is in an arcade cabinet: a big numeral
+   that climbs, not a 16px pill. Borrowed straight from DDR — big, central,
+   translucent, sitting BEHIND the action rather than beside it.
+
+   Placement is the whole trick. It lives in the band above the strike
+   plane and under the HUD chrome, anchored to the SAME env() origin as
+   that chrome (see the #teach note above — mixing env() and % anchors is
+   how the last overlap bug happened). Low opacity + no pointer events
+   means it can be enormous without stealing the eye from an armed note. */
+#combo-big {
+  position: absolute; z-index: 0;
+  /* MEASURED, not guessed. At env+210 the numeral band was 210-281 with
+     the top note row's upper edge projecting to y=287 — six pixels of
+     clearance, and an armed note (scale x1.08) eats most of that. There
+     is no room lower down, so the tower moves UP into the teach card's
+     band instead and the two are made mutually exclusive in JS (see
+     paintComboTower): a trophy and an instruction must never stack, which
+     is the collision the last HUD bug was made of. Clearance to the note
+     rows is now ~66px. */
+  top: calc(env(safe-area-inset-top, 0px) + 150px);
+  left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+#combo-big.on { opacity: 1; }
+#combo-num {
+  font-size: clamp(56px, 22vw, 132px);
+  font-weight: 800; line-height: 0.86;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 214, 150, 0.30);
+  text-shadow: 0 0 34px rgba(247, 147, 26, 0.28);
+}
+#combo-word {
+  font-size: 12px; letter-spacing: 0.42em; text-indent: 0.42em;
+  font-weight: 700;
+  color: rgba(255, 200, 130, 0.30);
+  margin-top: 4px;
+}
+/* Escalation — the tower brightens and warms as the chain grows, so a
+   ×120 screenshot cannot look like a ×12 one. Thresholds match the
+   celebration tiers, not the score multiplier. */
+#combo-big.c1 #combo-num { color: rgba(255,214,150,0.40); text-shadow: 0 0 40px rgba(247,147,26,0.38); }
+#combo-big.c2 #combo-num { color: rgba(255,226,175,0.52); text-shadow: 0 0 52px rgba(247,147,26,0.5); }
+#combo-big.c3 #combo-num {
+  color: rgba(255,241,214,0.66);
+  text-shadow: 0 0 64px rgba(247,147,26,0.66), 0 0 18px rgba(255,226,175,0.4);
+}
+#combo-big.c1 #combo-word { color: rgba(255,200,130,0.42); }
+#combo-big.c2 #combo-word { color: rgba(255,214,150,0.55); }
+#combo-big.c3 #combo-word { color: rgba(255,241,214,0.7); }
+/* per-hit tick · tiny, so a fast chain reads as a pulse not a jitter */
+#combo-big.tick #combo-num { animation: combonum 0.16s ease-out; }
+@keyframes combonum { 0% { transform: scale(1.12); } 100% { transform: scale(1); } }
+/* milestone · the arcade moment. Bigger, brighter, once per tier. */
+#combo-big.mile #combo-num { animation: combomileBig 0.62s cubic-bezier(0.2,0.9,0.2,1); }
+@keyframes combomileBig {
+  0%   { transform: scale(1); filter: brightness(1); }
+  30%  { transform: scale(1.5); filter: brightness(2.4); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+/* broken · the tower drops out of the sky rather than blinking off */
+#combo-big.broke { animation: combotowerbreak 0.42s ease-in forwards; }
+@keyframes combotowerbreak {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(26px) scale(0.9); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #combo-big.tick #combo-num,
+  #combo-big.mile #combo-num,
+  #combo-big.broke { animation: none; }
+}
+body.gm-frozen #combo-big, body.gm-frozen #combo-num { animation-play-state: paused !important; }
+
+/* the grade SLAM · the letter arrives 520ms after the card, because the
+   pause before the letter is where DDR keeps its end-of-song dopamine.
+   Overshoots and settles — a linear fade reads as a loading state. */
+#clear-grade.reveal { animation: gradeslam 0.52s cubic-bezier(0.16, 1.1, 0.3, 1); }
+@keyframes gradeslam {
+  0%   { opacity: 0; transform: scale(2.1); filter: blur(6px); }
+  55%  { opacity: 1; transform: scale(0.94); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@media (prefers-reduced-motion: reduce) { #clear-grade.reveal { animation: none; } }
+
+/* the REBUILD GHOST · combos 1-4, but only while climbing back from a
+   break. The tower normally earns the screen at 5; the four cuts before
+   that are the hardest emotional beat in a run (you just lost a chain)
+   and used to be the least-rewarded. A faint version shows the ladder
+   without pretending a x3 is a trophy. */
+#combo-big.ghost #combo-num {
+  color: rgba(255, 214, 150, 0.14);
+  text-shadow: 0 0 20px rgba(247, 147, 26, 0.12);
+}
+#combo-big.ghost #combo-word {
+  color: rgba(255, 200, 130, 0.13);
+}

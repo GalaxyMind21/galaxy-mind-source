@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  BITCOIN KART · Galaxy Mind Arcade cabinet no. 6
+  A 3D kart racer through bitcoin culture: 12 events across three worlds,
+  11 racers (5 bitcoiners, 5 foils, 1 locked ghost), Orange Blocks, sats,
+  drift sparks, the One Chair.
+
+  ENGINE
+    Custom WebGL2, zero dependencies. Vertex-colored flat-shaded meshes,
+    one sun + hemisphere ambient + orange rim light, gradient sky, fog,
+    instanced particles, blob shadows. ES modules under /bitcoin-kart/js/.
+    Saves under localStorage gm:bitcoin-kart:*.
+
+  CREDITS + DISCLAIMER
+    Unofficial fan game and affectionate parody. Not affiliated with
+    Strategy Inc., Michael Saylor, Phong Le, Adam Livingston, Jack Mallers,
+    Nayib Bukele, Peter Schiff, Jamie Dimon, Elizabeth Warren,
+    Warren Buffett, Mark Cuban, or any depicted person or company.
+    Educational and entertainment only. Not financial advice.
+    No Nintendo affiliation. All art, music and sound are original,
+    composed for this game.
+
+  MUSIC SLOTS
+    Optional operator-supplied loops: set window.BITCOIN_KART_MUSIC =
+    { themeKey: "/path/to/loop.ogg", ... } before the module loads and the
+    file replaces the built-in chiptune for that key. Theme keys live in
+    js/music.js. Only ship audio you hold the rights to.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="robots" content="index,follow">
+<title>BITCOIN KART · Ten racers. One chair. · Galaxy Mind Arcade</title>
+<meta name="description" content="A free 3D kart racer through bitcoin culture. Race Saylor, Mallers and Bukele against Schiff, Dimon and Buffett across 12 tracks. Drift, boost, One Chair.">
+<link rel="canonical" href="https://galaxymind.space/bitcoin-kart">
+<meta property="og:title" content="BITCOIN KART · Galaxy Mind Arcade">
+<meta property="og:description" content="One chair. Ten racers. No second best. A free 3D kart racer through bitcoin culture: 12 tracks, Orange Blocks, laser eyes, the Regulatory Hammer.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://galaxymind.space/bitcoin-kart">
+<meta property="og:image" content="https://galaxymind.space/bitcoin-kart-og.png">
+<meta property="og:image:alt" content="BITCOIN KART title art: a kart racer in Galaxy Mind black and Bitcoin orange">
+<meta property="og:site_name" content="Galaxy Mind Arcade">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@GalaxyMind">
+<meta name="twitter:creator" content="@GalaxyMind">
+<meta name="twitter:image" content="https://galaxymind.space/bitcoin-kart-og.png">
+<meta name="twitter:image:alt" content="BITCOIN KART title art: a kart racer in Galaxy Mind black and Bitcoin orange">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="manifest" href="/bitcoin-kart/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/bitcoin-kart/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BTC Kart">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F7931A'/%3E%3Ctext x='32' y='44' font-family='Menlo,monospace' font-size='36' font-weight='bold' text-anchor='middle' fill='%230A0A0B'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/bitcoin-kart/css/style.css">
+<!--
+  JSON-LD uses ASCII-only strings and no raw angle brackets so this inert
+  data block stays safe under the locked static CSP for this path.
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"VideoGame","@id":"https://galaxymind.space/bitcoin-kart#game",
+  "name":"Bitcoin Kart","url":"https://galaxymind.space/bitcoin-kart",
+  "description":"A free browser 3D kart racer through bitcoin culture. Five bitcoiners, five foils, one locked ghost of the protocol. Twelve tracks across Genesis, Neon and Corporate worlds.",
+  "genre":["Racing","Arcade"],"gamePlatform":"Web browser","playMode":"SinglePlayer",
+  "isAccessibleForFree":true,
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "author":{"@id":"https://galaxymind.space/#org"},
+  "publisher":{"@id":"https://galaxymind.space/#org"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Galaxy Mind","item":"https://galaxymind.space/"},
+  {"@type":"ListItem","position":2,"name":"Arcade","item":"https://galaxymind.space/arcade"},
+  {"@type":"ListItem","position":3,"name":"Bitcoin Kart","item":"https://galaxymind.space/bitcoin-kart"}]},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Is Bitcoin Kart free to play?",
+   "acceptedAnswer":{"@type":"Answer","text":"Yes. Bitcoin Kart is a free browser game in the Galaxy Mind Arcade. No account, no wallet, no payment. Progress saves locally in your browser."}},
+  {"@type":"Question","name":"Is Bitcoin Kart affiliated with Michael Saylor or Strategy Inc.?",
+   "acceptedAnswer":{"@type":"Answer","text":"No. It is an unofficial fan game and affectionate parody, not affiliated with or endorsed by Strategy Inc., Michael Saylor, Peter Schiff, or any depicted person or company. Educational and entertainment only, not financial advice."}},
+  {"@type":"Question","name":"How do I unlock Satoshi?",
+   "acceptedAnswer":{"@type":"Answer","text":"Open the Corporate Gate in Adventure mode, beat Peter Schiff in the final boss race at the Gold Mine, and hold at least twelve Orange Balloons. The signal recovers itself."}},
+  {"@type":"Question","name":"Is this a Nintendo game?",
+   "acceptedAnswer":{"@type":"Answer","text":"No. Bitcoin Kart is an original game with original art, music and characters, inspired by the feel of classic kart racers. It is not affiliated with Nintendo."}}]}
+]}
+</script>
+</head>
+<body>
+<header id="marquee">
+  <a class="brand" href="/">GALAXY MIND</a>
+  <span class="marquee-dot">·</span>
+  <span class="marquee-name">ARCADE</span>
+  <div class="audio-toggles" role="group" aria-label="Audio controls">
+    <button class="aud-toggle" data-aud="music" type="button" aria-pressed="true" title="Music on/off">
+      <span class="aud-glyph">&#9834;</span><span class="aud-label">MUSIC</span><span class="aud-state">ON</span>
+    </button>
+    <button class="aud-toggle" data-aud="sfx" type="button" aria-pressed="true" title="Sound effects on/off">
+      <span class="aud-glyph">&#9835;</span><span class="aud-label">SFX</span><span class="aud-state">ON</span>
+    </button>
+  </div>
+  <a class="cta" href="/arcade">More Bitcoin games →</a>
+</header>
+<main>
+  <div id="stage">
+    <canvas id="gl"></canvas>
+    <div id="hud"></div>
+    <div id="ui"></div>
+    <div id="touch"></div>
+    <div id="compat">
+      <div class="compat-box">
+        <h2>COMPATIBILITY MODE</h2>
+        <p>Bitcoin Kart is a full 3D kart racer and needs WebGL2, which this browser or device does not offer. Try a current version of Chrome, Firefox, Safari or Edge, or another device.</p>
+        <p>The rest of the arcade still works everywhere:</p>
+        <p><a href="/super-saylor">Super Saylor, the platformer →</a></p>
+        <p><a href="/arcade">All cabinets →</a></p>
+      </div>
+    </div>
+  </div>
+
+  <section id="about">
+    <h1>BITCOIN KART · a free 3D kart racer through bitcoin culture</h1>
+    <p>
+      One chair. Ten racers. No second best. Bitcoin Kart is the sixth cabinet in the
+      Galaxy Mind Arcade: a browser kart racer where Team Bitcoin (Michael Saylor's
+      throne-kart, Jack Mallers' lightning bolt, Nayib Bukele's volcano board) lines up
+      against Team Fiat (Peter Schiff's gold-bar dragster, Jamie Dimon's bank vault,
+      Warren Buffett's value wagon). Twelve events across three worlds: the Genesis beaches, the Neon
+      FOMO city and the Corporate glass towers, ending at Schiff's Gold Mine. Drift for
+      mini-turbos, smash Orange Blocks for items like the Ratio Missile and the
+      Regulatory Hammer, stack sats for top speed, and earn Orange Balloons in
+      Adventure mode to unseal the Timechain Atoll's gates. Finish the Orange Circuit
+      and the ghost of the protocol joins the grid.
+    </p>
+    <dl class="faq">
+      <dt>Is Bitcoin Kart free to play?</dt>
+      <dd>Yes. No account, no wallet, no payment. Progress saves locally in your browser.</dd>
+      <dt>Is Bitcoin Kart affiliated with Michael Saylor or Strategy Inc.?</dt>
+      <dd>No. It is an unofficial fan game and affectionate parody, not affiliated with or endorsed by Strategy Inc., Michael Saylor, Peter Schiff, or any depicted person or company. Educational and entertainment only, not financial advice.</dd>
+      <dt>How do I unlock Satoshi?</dt>
+      <dd>Open the Corporate Gate in Adventure mode, beat Peter Schiff in the final boss race at the Gold Mine, and hold at least twelve Orange Balloons. The signal recovers itself.</dd>
+      <dt>Is this a Nintendo game?</dt>
+      <dd>No. Bitcoin Kart is an original game with original art, music and characters, inspired by the feel of classic kart racers. It is not affiliated with Nintendo.</dd>
+    </dl>
+    <nav id="explore" aria-label="More Galaxy Mind">
+      <a href="/arcade">The Arcade</a>
+      <a href="/super-saylor">Super Saylor · the platformer</a>
+      <a href="/stack">Should I buy Bitcoin?</a>
+      <a href="/float">How much BTC is left?</a>
+      <a href="/treasuries">Treasury stocks</a>
+    </nav>
+  </section>
+</main>
+<footer id="foot">
+  GALAXY MIND ARCADE · BITCOIN KART · unofficial fan game and affectionate parody ·
+  not affiliated with Strategy Inc., Michael Saylor, Phong Le, Adam Livingston, Jack Mallers,
+  Nayib Bukele, Peter Schiff, Jamie Dimon, Elizabeth Warren, Warren Buffett, Mark Cuban,
+  or any depicted person or company · not financial advice · educational entertainment ·
+  no Nintendo affiliation · not affiliated with Nintendo ·
+  music and sound: original chiptune composed for this game ·
+  <a href="https://galaxymind.space">galaxymind.space</a>
+</footer>
+<script src="/arcade-open-browser.js"></script>
+<script type="module" src="/bitcoin-kart/js/main.js"></script>
+</body>
+</html>

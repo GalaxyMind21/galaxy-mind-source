@@ -1,0 +1,78 @@
+name: iOS simulator
+
+on:
+  pull_request:
+    paths:
+      - "ios-arcade/**"
+      - ".github/workflows/ios-simulator.yml"
+  workflow_dispatch:
+
+# Least privilege: the job only reads the tree.
+permissions:
+  contents: read
+
+jobs:
+  simulator:
+    runs-on: macos-15
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: ios-arcade
+    env:
+      COCOAPODS_DISABLE_STATS: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check distribution certificate packaging
+        run: ruby scripts/test-p12-export.rb
+
+      - name: Select Xcode
+        run: |
+          set -euo pipefail
+          selected="$(python3 scripts/select-xcode.py)"
+          if [ -n "$selected" ]; then
+            sudo xcode-select -s "$selected"
+          fi
+          xcodebuild -version
+          pod --version
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ios-arcade/package-lock.json
+
+      - name: Install JS
+        run: npm ci
+
+      - name: Bundle games
+        run: node scripts/sync-games.mjs
+
+      - name: Check game routes
+        run: node scripts/test-capacitor-routes.mjs
+
+      - name: Capacitor sync
+        run: npx cap sync ios
+
+      - name: Apply config
+        run: node scripts/apply-config.mjs
+
+      - name: Unsigned simulator build
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "${RUNNER_TEMP}/dd" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+          plist="$(find "${RUNNER_TEMP}/dd/Build/Products" -path '*iphonesimulator*' -name Info.plist -print | head -n 1)"
+          test -n "$plist"
+          version="$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$plist")"
+          echo "MinimumOSVersion ${version}"
+          test "$version" = "15.0"

@@ -1,0 +1,43 @@
+{
+  "_license": "Every track here is CC0 or CC-BY. CC-BY tracks REQUIRE visible attribution — it is rendered in the game's SETTINGS panel (see MUSIC_CREDITS in public/chop/js/main.js). If you add or remove a CC-BY track, update that list in the same commit. Transcoded to AAC-LC 112k m4a (the one codec iOS Safari's decodeAudioData accepts).",
+  "_offset_note": "offsetSec = seconds from the start of the DECODED file to the first beat of the grid. Do NOT assume 0, and do NOT take analyseBeatGrid's reported offsetSec at face value — see _verified.",
+  "_verified": {
+    "how": "Search-free grid test — impose a FIXED tempo AND a fixed offset, then measure the median distance from each beat to the nearest real onset, reported per THIRD of the track so drift is visible. The winning (bpm, offset) pair is the one with the lowest medians across all three thirds. Harness: scripts/derive-chop-grid.mjs (Node, decodes via ffmpeg and calls the SHIPPED public/chop/js/beatgrid.js). Re-run after ANY change to the audio files.",
+    "date": "2026-08-06",
+    "result": "All 9 tracks measured. The 6 original tracks' offsetSec:0 was RE-CONFIRMED correct (medians 1.5-7ms per third). The 3 new tracks were each tested at offset 0 vs the detector's suggestion and the winner adopted.",
+    "TRAP": "analyseBeatGrid's reported `offsetSec` is UNRELIABLE and contradicts its own validation metric. Its phase search returned 42-378ms downbeats for the original six; imposing those offsets made the grid 2-3x WORSE than offsetSec:0 (e.g. lost-utopia 2.0/2.4/1.5ms at offset 0 vs 11.7/11.2/11.9ms at the 'measured' 0.0425). The stale case-history table in beatgrid.js's own header repeats that bad reading — do not act on it. Only the imposed-grid median decides.",
+    "TRAP2": "tempoStability is a weak proxy and rejects good grids. big-room failed it (2.11) purely because its sparse intro third estimates a different tempo; the imposed grid measures 10.9/3.3/3.2ms per third — it gets TIGHTER over time, which is the opposite of drift. Always confirm with the per-third medians before rejecting a track.",
+    "perThirdMedianMs": {
+      "ascend": [6.9, 6.1, 5.9],
+      "starting-over": [21.8, 10.7, 5.5],
+      "flying-temple": [4.5, 5.4, 2.2],
+      "lost-utopia": [2.0, 2.4, 1.5],
+      "drama": [7.2, 7.2, 7.2],
+      "extended": [2.6, 2.3, 1.5],
+      "faxing-berlin": [4.4, 4.7, 5.0],
+      "take-you-higher": [25.0, 9.9, 5.4],
+      "big-room": [10.9, 3.3, 3.2]
+    }
+  },
+  "tracks": [
+    { "file": "faxing-berlin.m4a", "title": "Faxing Berlin", "bpm": 128, "offsetSec": 0.1135,
+      "artist": "1000 Handz", "license": "CC BY 4.0", "source": "https://freemusicarchive.org/music/1000-handz/cc-by-free-to-use-dancehouse-instrumentals/faxing-berlin/" },
+    { "file": "big-room.m4a", "title": "Big Room", "bpm": 128, "offsetSec": 0.2824,
+      "artist": "Maxim Nick", "license": "CC BY 3.0", "source": "https://opengameart.org/content/big-room-track-2",
+      "originalTitle": "Big room track #2", "licenseUrl": "https://creativecommons.org/licenses/by/3.0/", "changes": "transcoded to AAC" },
+    { "file": "take-you-higher.m4a", "title": "Take You Higher", "bpm": 126.05, "offsetSec": 0,
+      "artist": "1000 Handz", "license": "CC BY 4.0", "source": "https://freemusicarchive.org/music/1000-handz/cc-by-free-to-use-dancehouse-instrumentals/take-you-higher/" },
+    { "file": "ascend.m4a", "title": "Ascend", "bpm": 130, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-1" },
+    { "file": "starting-over.m4a", "title": "Starting Over", "bpm": 124, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-1" },
+    { "file": "flying-temple.m4a", "title": "Flying Temple", "bpm": 128, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-1" },
+    { "file": "lost-utopia.m4a", "title": "Lost Utopia", "bpm": 127, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-1" },
+    { "file": "drama.m4a", "title": "Drama", "bpm": 130, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-2" },
+    { "file": "extended.m4a", "title": "Extended", "bpm": 120, "offsetSec": 0,
+      "artist": "Tricks & Traps", "license": "CC0", "source": "https://opengameart.org/content/free-rhythm-game-music-pack-2", "sourceFile": "5_extended.wav" }
+  ]
+}

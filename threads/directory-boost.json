@@ -1,0 +1,7 @@
+{
+  "description": "Single-tweet paid-boost asset · drives cold-audience X traffic to galaxymind.space (the vendor directory, Galaxy Mind's most successful page). Opens with the canonical 'bitcoin can't be spent' complaint and refutes it with hard numbers + scannable categories. CTA is the bare apex URL, no subscription or signup friction at the destination. Designed to be A/B-able against recruitment-boost.json's tweet 1 since both target the same paid surface but with different goals (this = consumer browse traffic, that = vendor recruitment).",
+  "target": "x",
+  "tweets": [
+    "\"You can't really spend bitcoin on anything.\"\n\n72 merchants on Galaxy Mind disagree.\n\nA free directory of shops that take BTC for real goods. Apparel, hardware, food, art, books, services across 15 countries.\n\nNo subscription. No tracking.\n\ngalaxymind.space"
+  ]
+}

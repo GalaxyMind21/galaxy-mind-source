@@ -1,0 +1,14 @@
+Galaxy Mind: Bitcoin Games is eight offline arcade games in a WebView shell. The games are bundled. The app does not load galaxymind.space inside the game view.
+
+How to look around:
+- The home screen lists Bitcoin Kart, Super Saylor, CHOP, WEN, The Bitcoin Gauntlet, Node Runner, Timechain, and The HODL Trail.
+- Bitcoin Kart and Super Saylor show on-screen touch controls. CHOP is a swipe. Node Runner and Timechain are one-tap. WEN, the Gauntlet, and the Trail scroll.
+- A score labeled sats is a play point, like a pinball score. The first launch says so. The app has no wallet, no purchase, no ads, and no contest.
+- CHOP uses a saved block, not the live chain. WEN, the Gauntlet, and Node Runner use saved price history. Banners in those games say so.
+- Bitcoin Kart and Super Saylor are unofficial parodies. They are not affiliated with the people or companies they caricature, or with any other game.
+- Game Center is compiled so it can be turned on later. GMGameCenterEnabled is false, and there is no Game Center entitlement in this build. Scores stay on the device.
+- Links to galaxymind.space and to X open in a Safari sheet. Other links do not.
+- Privacy: the app collects nothing. The privacy policy URL is the website's policy, which describes the website. This binary does not embed that site.
+- Export compliance is set in Info.plist (ITSAppUsesNonExemptEncryption = false). No non-exempt encryption.
+
+Sign-in is not required. There is no demo account.

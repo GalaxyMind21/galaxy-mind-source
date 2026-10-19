@@ -1,0 +1,424 @@
+{
+  "label": "hashrate-before",
+  "url": "https://galaxymind.space/hashrate",
+  "primarySelector": "main :is(article, li, tr, [data-item])",
+  "measuredAt": "2026-08-27T19:34:14.794Z",
+  "viewports": {
+    "mobile": {
+      "viewportPx": [
+        390,
+        844
+      ],
+      "contentReach": {
+        "primarySelector": "main :is(article, li, tr, [data-item])",
+        "primaryFound": true,
+        "pxToPrimary": 3973,
+        "screensToPrimary": 4.71,
+        "primaryAboveFold": false
+      },
+      "scale": {
+        "pageHeightPx": 14124,
+        "screensTall": 16.7,
+        "domNodes": 1103
+      },
+      "aboveFold": {
+        "interactiveCount": 11,
+        "primaryItemsInFold": 0,
+        "interactiveLabels": [
+          "Galaxy Mind home",
+          "Search · jump to any vendor, tool, or te",
+          "Switch to light theme",
+          "Support Galaxy Mind",
+          "Rent nowRent↓",
+          "Rent now ↓",
+          "Spend",
+          "₿Mine",
+          "Play. 6 daily games open.",
+          "Buy?",
+          "More"
+        ]
+      },
+      "chrome": {
+        "pinnedCount": 3,
+        "pinnedPx": 163,
+        "pinnedRatio": 0.193,
+        "pinned": [
+          {
+            "h": 61,
+            "pos": "sticky",
+            "text": "Galaxy MindSpendMineInstrumentsArcadeLearn₿$"
+          },
+          {
+            "h": 55,
+            "pos": "fixed",
+            "text": "Spend₿Mine6PlayBuy?More"
+          },
+          {
+            "h": 47,
+            "pos": "fixed",
+            "text": "↑"
+          }
+        ]
+      },
+      "entropy": {
+        "fontSizes": 21,
+        "fontWeights": 4,
+        "letterSpacings": 16,
+        "borderRadii": 8,
+        "boxShadows": 17,
+        "colors": 20,
+        "fontFamilies": 3,
+        "total": 66,
+        "monoUppercaseCharRatio": 0.102,
+        "topFontSizes": [
+          [
+            "18.0625px",
+            460
+          ],
+          [
+            "14.875px",
+            151
+          ],
+          [
+            "12.75px",
+            92
+          ],
+          [
+            "13px",
+            83
+          ],
+          [
+            "12px",
+            48
+          ],
+          [
+            "11px",
+            39
+          ],
+          [
+            "15px",
+            26
+          ],
+          [
+            "21.25px",
+            9
+          ],
+          [
+            "13.8125px",
+            6
+          ],
+          [
+            "24.18px",
+            6
+          ],
+          [
+            "10px",
+            4
+          ],
+          [
+            "17px",
+            3
+          ]
+        ]
+      },
+      "a11y": {
+        "h1Count": 1,
+        "headingCount": 3,
+        "headingLevelSkips": 1,
+        "headingsPer1000px": 0.21,
+        "outline": [
+          "H1 Rent bitcoin hashrate",
+          "H3 Keep exploring",
+          "H3 Data freshness · cite this page"
+        ],
+        "tapTargetsTotal": 142,
+        "tapTargetsUnder44": 66,
+        "smallestTargets": [
+          {
+            "label": "Skip to content",
+            "size": [
+              1,
+              1
+            ]
+          },
+          {
+            "label": "𝕏",
+            "size": [
+              11,
+              18
+            ]
+          },
+          {
+            "label": "FAQ →",
+            "size": [
+              39,
+              20
+            ]
+          },
+          {
+            "label": "Pick yours →",
+            "size": [
+              60,
+              14
+            ]
+          },
+          {
+            "label": "Live",
+            "size": [
+              52,
+              18
+            ]
+          },
+          {
+            "label": "About →",
+            "size": [
+              48,
+              20
+            ]
+          },
+          {
+            "label": "Italy",
+            "size": [
+              22,
+              44
+            ]
+          },
+          {
+            "label": "FAQ",
+            "size": [
+              24,
+              44
+            ]
+          }
+        ],
+        "contrastSamples": 353,
+        "contrastFailures": 0,
+        "worstContrast": []
+      },
+      "perf": {
+        "loadMs": 1502,
+        "lcpMs": 528,
+        "cls": 0,
+        "longTasks": 0,
+        "longTaskMs": 0,
+        "firstInteractionMs": 21.7
+      },
+      "score": {
+        "reach": 0,
+        "focus": 72,
+        "chrome": 83,
+        "entropy": 68,
+        "a11y": 75,
+        "perf": 100,
+        "overall": 66
+      }
+    },
+    "desktop": {
+      "viewportPx": [
+        1440,
+        900
+      ],
+      "contentReach": {
+        "primarySelector": "main :is(article, li, tr, [data-item])",
+        "primaryFound": true,
+        "pxToPrimary": 2982,
+        "screensToPrimary": 3.31,
+        "primaryAboveFold": false
+      },
+      "scale": {
+        "pageHeightPx": 10436,
+        "screensTall": 11.6,
+        "domNodes": 1103
+      },
+      "aboveFold": {
+        "interactiveCount": 14,
+        "primaryItemsInFold": 0,
+        "interactiveLabels": [
+          "Galaxy Mind home",
+          "Spend",
+          "Mine",
+          "Instruments",
+          "Arcade",
+          "Learn",
+          "WEN #51 is open · date today's tape",
+          "Search · jump to any vendor, tool, or te",
+          "EN",
+          "ES",
+          "Switch to light theme",
+          "Support Galaxy Mind",
+          "Rent nowRent↓",
+          "Rent now ↓"
+        ]
+      },
+      "chrome": {
+        "pinnedCount": 2,
+        "pinnedPx": 120,
+        "pinnedRatio": 0.133,
+        "pinned": [
+          {
+            "h": 69,
+            "pos": "sticky",
+            "text": "Galaxy MindSpendMineInstrumentsArcadeLearn₿$"
+          },
+          {
+            "h": 51,
+            "pos": "fixed",
+            "text": "↑"
+          }
+        ]
+      },
+      "entropy": {
+        "fontSizes": 18,
+        "fontWeights": 3,
+        "letterSpacings": 18,
+        "borderRadii": 8,
+        "boxShadows": 15,
+        "colors": 21,
+        "fontFamilies": 3,
+        "total": 62,
+        "monoUppercaseCharRatio": 0.103,
+        "topFontSizes": [
+          [
+            "18.0625px",
+            456
+          ],
+          [
+            "14.875px",
+            151
+          ],
+          [
+            "12.75px",
+            96
+          ],
+          [
+            "13px",
+            83
+          ],
+          [
+            "12px",
+            49
+          ],
+          [
+            "15px",
+            27
+          ],
+          [
+            "11px",
+            9
+          ],
+          [
+            "15.9375px",
+            7
+          ],
+          [
+            "13.8125px",
+            6
+          ],
+          [
+            "51px",
+            6
+          ],
+          [
+            "63.75px",
+            6
+          ],
+          [
+            "10px",
+            5
+          ]
+        ]
+      },
+      "a11y": {
+        "h1Count": 1,
+        "headingCount": 3,
+        "headingLevelSkips": 1,
+        "headingsPer1000px": 0.29,
+        "outline": [
+          "H1 Rent bitcoin hashrate",
+          "H3 Keep exploring",
+          "H3 Data freshness · cite this page"
+        ],
+        "tapTargetsTotal": 145,
+        "tapTargetsUnder44": 74,
+        "smallestTargets": [
+          {
+            "label": "Skip to content",
+            "size": [
+              1,
+              1
+            ]
+          },
+          {
+            "label": "𝕏",
+            "size": [
+              11,
+              18
+            ]
+          },
+          {
+            "label": "FAQ →",
+            "size": [
+              39,
+              20
+            ]
+          },
+          {
+            "label": "Pick yours →",
+            "size": [
+              60,
+              14
+            ]
+          },
+          {
+            "label": "Live",
+            "size": [
+              52,
+              18
+            ]
+          },
+          {
+            "label": "About →",
+            "size": [
+              48,
+              20
+            ]
+          },
+          {
+            "label": "Italy",
+            "size": [
+              22,
+              44
+            ]
+          },
+          {
+            "label": "EN",
+            "size": [
+              31,
+              34
+            ]
+          }
+        ],
+        "contrastSamples": 355,
+        "contrastFailures": 0,
+        "worstContrast": []
+      },
+      "perf": {
+        "loadMs": 1291,
+        "lcpMs": 600,
+        "cls": 0.2558,
+        "longTasks": 0,
+        "longTaskMs": 0,
+        "firstInteractionMs": 43.4
+      },
+      "score": {
+        "reach": 0,
+        "focus": 56,
+        "chrome": 100,
+        "entropy": 73,
+        "a11y": 75,
+        "perf": 22,
+        "overall": 54
+      }
+    }
+  }
+}

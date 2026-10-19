@@ -1,0 +1,24 @@
+node_modules
+www
+ios/App/Pods
+ios/App/build
+ios/App/App/public
+ios/DerivedData
+*.xcuserstate
+xcuserdata
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output
+fastlane/README.md
+vendor/bundle
+.bundle
+*.p8
+AuthKey*
+.env
+.env.*
+build
+
+# Signing material (security audit 2026-10-18, L8). Never commit.
+*.p12
+*.p12.gpg
+*.mobileprovision

@@ -1,0 +1,13 @@
+{
+  "description": "4-tweet recruitment thread · designed to be paid-boosted. First tweet is the boost target (cold-audience friendly, self-explanatory). Replies 2-4 seed the thread so anyone who clicks through to the profile sees a full conversation. Post via scripts/post-thread.ts BEFORE running the X Ads boost so the thread exists from impression #1. See the README + the in-session campaign playbook for targeting / budget guidance.",
+  "target": "x",
+  "tweets": [
+    "Do you accept bitcoin for your shop or service?\n\nGalaxy Mind is a free directory built so Bitcoiners can actually find you.\n\n→ 72 vendors across 15 countries (newest: 🇸🇻)\n→ Free listing · no fees · no gatekeeping\n→ Submit in ~2 minutes\n\ngalaxymind.space/submit",
+
+    "After you're listed:\n\n→ Auto-tweet announces you to this account's followers\n→ Permanent vendor page with a custom OG preview card\n→ Eligible for the weekly Monday featured-vendor spotlight\n\nMost vendors see 50-200 new profile visits in the first 48 hours.",
+
+    "What this costs you:\n\nNothing.\n\nNo subscription. No premium tier. No equity ask. No data sharing.\n\nGalaxy Mind is independent, runs on Lightning tips. Free forever — the point is that more Bitcoin merchants = healthier circular economy.",
+
+    "If you take BTC for anything physical or for services — apparel, hardware, food, art, books, services — submit in ~2 minutes:\n\ngalaxymind.space/submit\n\nOr DM me your handle and I'll fill the form myself."
+  ]
+}

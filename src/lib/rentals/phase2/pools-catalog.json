@@ -1,0 +1,210 @@
+{
+ "version": "2026-10-16.3",
+ "pools": [
+  {
+   "id": "braiins",
+   "name": "Braiins Pool",
+   "username_format": "account[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://stratum.braiins.com:3333",
+    "stratum+tcp://stratum.braiins.com:443"
+   ],
+   "default": "stratum+tcp://stratum.braiins.com:3333"
+  },
+  {
+   "id": "braiins-solo",
+   "name": "Braiins Solo",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://solo.stratum.braiins.com:3333",
+    "stratum+tcp://solo.stratum.braiins.com:443",
+    "stratum+tcp://solo.stratum.braiins.com:25"
+   ],
+   "default": "stratum+tcp://solo.stratum.braiins.com:3333"
+  },
+  {
+   "id": "ocean",
+   "name": "OCEAN",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://mine.ocean.xyz:3334",
+    "stratum+tcp://no-signal.mine.ocean.xyz:3000",
+    "stratum+tcp://bip110.mine.ocean.xyz:3110"
+   ],
+   "default": "stratum+tcp://mine.ocean.xyz:3334"
+  },
+  {
+   "id": "f2pool",
+   "name": "F2Pool",
+   "username_format": "account[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://btc.f2pool.com:1314",
+    "stratum+tcp://btc.f2pool.com:3333",
+    "stratum+tcp://btc.f2pool.com:25",
+    "stratum+tcp://btc-asia.f2pool.com:1314",
+    "stratum+tcp://btc-asia.f2pool.com:1315",
+    "stratum+tcp://btc-asia.f2pool.com:3333",
+    "stratum+tcp://btc-asia.f2pool.com:25",
+    "stratum+tcp://btc-na.f2pool.com:1314",
+    "stratum+tcp://btc-na.f2pool.com:1315",
+    "stratum+tcp://btc-na.f2pool.com:3333",
+    "stratum+tcp://btc-na.f2pool.com:25",
+    "stratum+tcp://btc-euro.f2pool.com:1314",
+    "stratum+tcp://btc-euro.f2pool.com:1315",
+    "stratum+tcp://btc-euro.f2pool.com:3333",
+    "stratum+tcp://btc-euro.f2pool.com:25",
+    "stratum+tcp://btc-africa.f2pool.com:1314",
+    "stratum+tcp://btc-africa.f2pool.com:1315",
+    "stratum+tcp://btc-africa.f2pool.com:3333",
+    "stratum+tcp://btc-africa.f2pool.com:25",
+    "stratum+tcp://btc-latin.f2pool.com:1314",
+    "stratum+tcp://btc-latin.f2pool.com:1315",
+    "stratum+tcp://btc-latin.f2pool.com:3333",
+    "stratum+tcp://btc-latin.f2pool.com:25"
+   ],
+   "default": "stratum+tcp://btc.f2pool.com:1314"
+  },
+  {
+   "id": "antpool",
+   "name": "AntPool",
+   "username_format": "account[.worker]",
+   "password": "123",
+   "stratum": [
+    "stratum+tcp://ss.antpool.com:3333",
+    "stratum+tcp://ss.antpool.com:443",
+    "stratum+tcp://ss.antpool.com:25"
+   ],
+   "default": "stratum+tcp://ss.antpool.com:3333"
+  },
+  {
+   "id": "viabtc",
+   "name": "ViaBTC",
+   "username_format": "account[.worker]",
+   "password": "123",
+   "stratum": [
+    "stratum+tcp://btc.viabtc.io:3333",
+    "stratum+tcp://btc.viabtc.io:443",
+    "stratum+tcp://btc.viabtc.cc:3333",
+    "stratum+tcp://btc.viabtc.cc:443",
+    "stratum+tcp://btc.viabtc.top:3333",
+    "stratum+tcp://btc.viabtc.top:443",
+    "stratum+tcp://btc.powhashing.com:3333",
+    "stratum+tcp://btc.powhashing.com:443"
+   ],
+   "default": "stratum+tcp://btc.viabtc.io:3333"
+  },
+  {
+   "id": "luxor",
+   "name": "Luxor",
+   "username_format": "account[.worker]",
+   "password": "123",
+   "stratum": [
+    "stratum+tcp://btc.global.luxor.tech:700"
+   ],
+   "default": "stratum+tcp://btc.global.luxor.tech:700"
+  },
+  {
+   "id": "spiderpool",
+   "name": "SpiderPool",
+   "username_format": "account[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://btc-us.spiderpool.com:2309",
+    "stratum+tcp://btc-us.spiderpool.com:3333",
+    "stratum+tcp://btc-us.spiderpool.com:1800",
+    "stratum+tcp://btc-us.spiderpool.com:443",
+    "stratum+tcp://btc-eu.spiderpool.com:2309",
+    "stratum+tcp://btc-eu.spiderpool.com:3333",
+    "stratum+tcp://btc-eu.spiderpool.com:1800",
+    "stratum+tcp://btc-eu.spiderpool.com:443",
+    "stratum+tcp://btc-as.spiderpool.com:2309",
+    "stratum+tcp://btc-as.spiderpool.com:3333",
+    "stratum+tcp://btc-as.spiderpool.com:1800",
+    "stratum+tcp://btc-as.spiderpool.com:443"
+   ],
+   "default": "stratum+tcp://btc-us.spiderpool.com:2309"
+  },
+  {
+   "id": "nicehash",
+   "name": "NiceHash",
+   "username_format": "nicehash_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://sha256asicboost.auto.nicehash.com:9200"
+   ],
+   "default": "stratum+tcp://sha256asicboost.auto.nicehash.com:9200"
+  },
+  {
+   "id": "parasite",
+   "name": "Parasite Pool",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://parasite.wtf:42069",
+    "stratum+tcp://parasite.wtf:42068"
+   ],
+   "default": "stratum+tcp://parasite.wtf:42069"
+  },
+  {
+   "id": "ckpool-solo",
+   "name": "Solo CKPool",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://stratum.ckpool.org:3333",
+    "stratum+tcp://stratum.ckpool.org:4334",
+    "stratum+tcp://solo.ckpool.org:3333",
+    "stratum+tcp://solo.ckpool.org:4334",
+    "stratum+tcp://uwsolo.ckpool.org:3333",
+    "stratum+tcp://uwsolo.ckpool.org:4334",
+    "stratum+tcp://uesolo.ckpool.org:3333",
+    "stratum+tcp://uesolo.ckpool.org:4334",
+    "stratum+tcp://eusolo.ckpool.org:3333",
+    "stratum+tcp://eusolo.ckpool.org:4334",
+    "stratum+tcp://sgsolo.ckpool.org:3333",
+    "stratum+tcp://sgsolo.ckpool.org:4334",
+    "stratum+tcp://ausolo.ckpool.org:3333",
+    "stratum+tcp://ausolo.ckpool.org:4334"
+   ],
+   "default": "stratum+tcp://stratum.ckpool.org:3333"
+  },
+  {
+   "id": "public-pool",
+   "name": "Public Pool",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://public-pool.io:3333",
+    "stratum+tcp://public-pool.io:13333"
+   ],
+   "default": "stratum+tcp://public-pool.io:3333"
+  },
+  {
+   "id": "solopool",
+   "name": "SoloPool.com",
+   "username_format": "btc_address[.worker]",
+   "password": "x",
+   "stratum": [
+    "stratum+tcp://stratum.solopool.com:3333",
+    "stratum+tcp://stratum.solopool.com:4444",
+    "stratum+tcp://la.solopool.com:3333",
+    "stratum+tcp://la.solopool.com:4444",
+    "stratum+tcp://eu.solopool.com:3333",
+    "stratum+tcp://eu.solopool.com:4444",
+    "stratum+tcp://east.solopool.com:3333",
+    "stratum+tcp://east.solopool.com:4444",
+    "stratum+tcp://asia.solopool.com:3333",
+    "stratum+tcp://asia.solopool.com:4444",
+    "stratum+tcp://me.solopool.com:3333",
+    "stratum+tcp://me.solopool.com:4444",
+    "stratum+tcp://sp.solopool.com:3333",
+    "stratum+tcp://sp.solopool.com:4444"
+   ],
+   "default": "stratum+tcp://stratum.solopool.com:3333"
+  }
+ ]
+}

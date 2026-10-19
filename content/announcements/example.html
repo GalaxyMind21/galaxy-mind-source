@@ -1,0 +1,47 @@
+<!--
+  Example announcement template.
+  Copy this file to e.g. content/announcements/2026-05-vendors-50.html,
+  customize, then send via:
+
+    npx tsx scripts/send-announcement.ts \
+      --subject "Galaxy Mind hit 50 vendors!" \
+      --html-file content/announcements/2026-05-vendors-50.html \
+      --to-only your@email.com   # test first
+      --confirm                   # then real send
+
+  REQUIRED: include the {{UNSUB_URL}} placeholder somewhere in the
+  body. The script will refuse to send without it (CAN-SPAM
+  compliance + List-Unsubscribe header is set automatically).
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Galaxy Mind announcement</title>
+</head>
+<body style="margin:0;padding:0;background:#0A0A0B;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#F5F5F7;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <div style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#9999A1;margin-bottom:8px;">
+      Galaxy Mind · Update
+    </div>
+    <h1 style="font-size:32px;line-height:1.15;margin:0 0 16px 0;color:#F7931A;font-weight:600;">
+      Big milestone today.
+    </h1>
+    <p style="font-size:15px;line-height:1.55;color:#9999A1;margin:24px 0;">
+      [Replace this paragraph with your announcement copy. Keep it
+      short · most subscribers signed up for extreme alerts, not a
+      newsletter, so respect their inbox.]
+    </p>
+    <a href="https://galaxymind.space/stack?utm_source=email&utm_medium=announcement"
+       style="display:inline-block;background:#F7931A;color:#0A0A0B;text-decoration:none;font-weight:600;font-size:14px;letter-spacing:0.18em;text-transform:uppercase;padding:14px 28px;border-radius:6px;margin:16px 0;">
+      View on the site →
+    </a>
+    <hr style="border:none;border-top:1px solid #26262C;margin:32px 0;">
+    <p style="font-size:11px;color:#5C5C66;line-height:1.6;">
+      Not financial advice. Built by
+      <a href="https://x.com/GalaxyMind" style="color:#F7931A;">@GalaxyMind</a>. ·
+      <a href="{{UNSUB_URL}}" style="color:#9999A1;text-decoration:underline;">Unsubscribe</a>
+    </p>
+  </div>
+</body>
+</html>

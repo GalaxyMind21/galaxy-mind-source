@@ -1,0 +1,21 @@
+/* SIX DEEP gray-box · minimal chrome, the canvas is the product */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #0A0A0B; overflow: hidden; touch-action: none; }
+#stage { position: fixed; inset: 0; }
+#gl { width: 100%; height: 100%; display: block; }
+#hud { position: absolute; inset: 0; pointer-events: none; font-family: ui-monospace, Menlo, monospace; color: #F5F5F7; }
+.hud-depth { position: absolute; top: max(14px, env(safe-area-inset-top)); left: 18px; font-size: 34px; font-weight: 800; letter-spacing: 0.04em; color: #F7931A; text-shadow: 0 2px 12px rgba(247,147,26,0.35); }
+.hud-world { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 18px; font-size: 11px; letter-spacing: 0.22em; color: #9999A1; text-transform: uppercase; }
+.hud-layer { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 18px; font-size: 12px; letter-spacing: 0.2em; color: #9999A1; }
+#overlay, #results { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10,10,11,0.82); font-family: ui-monospace, Menlo, monospace; }
+#results[hidden] { display: none; }
+.panel { text-align: center; color: #F5F5F7; padding: 28px; max-width: 400px; }
+.panel h1 { font-size: 44px; letter-spacing: 0.06em; margin-bottom: 6px; }
+.orange { color: #F7931A; }
+.tag { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #9999A1; margin-bottom: 14px; }
+.world { font-size: 12px; letter-spacing: 0.12em; color: #9999A1; margin-bottom: 16px; }
+.how { font-size: 13px; line-height: 1.75; color: #C9C9CF; margin-bottom: 22px; }
+.score { font-size: 40px; font-weight: 800; color: #F7931A; margin: 10px 0 6px; }
+button { font: inherit; font-weight: 800; letter-spacing: 0.14em; background: #F7931A; color: #0A0A0B; border: 0; border-radius: 10px; padding: 14px 26px; margin: 6px; cursor: pointer; }
+button:active { transform: translateY(1px); }
+#fresh { background: transparent; color: #F7931A; border: 1px solid rgba(247,147,26,0.5); }

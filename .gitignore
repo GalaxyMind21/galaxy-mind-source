@@ -1,0 +1,103 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# Operator drop-in of the Vercel Production CRON_SECRET for local
+# queue scripts (scripts/cron-secret.ts). Never commit. vercel env
+# pull returns this var empty because it is Sensitive / write-only.
+.cron-secret
+
+# vercel
+.vercel
+
+# KV backups (scripts/backup-kv.ts) — contain subscriber emails
+# (sub:prefs:* / fit-alert:* / vendor-notify:* / push:sub:*). PII.
+# NEVER commit these; store copies off-machine instead.
+/backups/
+
+# Google Search Console service-account key (scripts/pull-gsc.ts).
+# Contains an RSA PRIVATE KEY that grants read access to the property.
+# NEVER commit; re-download from Google Cloud if lost.
+.gsc-key.json
+gsc-key.json
+
+# superpowers brainstorm session artifacts (HTML mockups, server state)
+.superpowers/
+
+# git worktrees (superpowers:using-git-worktrees skill)
+.worktrees/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+og-previews/
+
+.env*.local
+
+# grok cli local config
+.grok/
+
+# Playwright MCP session artifacts (traces, screenshots) — QA scratch,
+# same class as .superpowers/ above. Never commit.
+.playwright-mcp/
+
+# CHOP visual-QA captures (local only)
+.chop-qa/
+
+# Sizzle-reel capture output (92MB of webm/png at last count). The rig
+# is scripted and reproducible and the finals live on the Desktop, so
+# the intermediates are scratch · same class as .chop-qa/ above.
+sizzle-out/
+
+# Scratch screenshots the capture rigs drop at the repo root.
+.tmp_*
+
+# One-off probe scripts a session writes to measure something once
+# (tmp-lcp-probe, _tmp-tap-audit, …). Twelve of these accumulated
+# untracked during the 2026-08/09 design pass, where a careless
+# `git add -A` would have committed them as if they were tooling.
+# Real tooling never carries this prefix; throwaway probes belong in
+# the session scratchpad, and these patterns are the safety net.
+scripts/tmp-*
+scripts/_tmp-*
+
+# Signing material (security audit 2026-10-18, L8). Never commit.
+*.p12
+*.p12.gpg
+*.mobileprovision
+
+# Python bytecode
+__pycache__/
+*.pyc

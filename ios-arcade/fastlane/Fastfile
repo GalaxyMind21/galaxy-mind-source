@@ -1,0 +1,465 @@
+require "base64"
+require "json"
+require "open3"
+require "fileutils"
+require "securerandom"
+require "tmpdir"
+require_relative "asc_key"
+require_relative "dist_p12"
+
+opt_out_usage
+
+# app_store_connect_api_key does not put a path on the returned token when
+# the .p8 is passed as key_content, so xcodebuild was invoked with
+# -authenticationKeyPath ''. Write the file ourselves and pass that path.
+BUNDLE_ID = "space.galaxymind.arcade".freeze
+
+def write_asc_key(key_id, secret)
+  UI.user_error!("ASC_KEY_ID is not a key id") unless key_id.to_s.match?(/\A[A-Za-z0-9]+\z/)
+  begin
+    body, kind = AscKey.normalize(secret)
+  rescue AscKey::FormatError => e
+    UI.user_error!(e.message)
+  end
+  dir = ENV["RUNNER_TEMP"]
+  dir = Dir.tmpdir if dir.nil? || dir.strip.empty?
+  path = File.expand_path(File.join(dir, "AuthKey_#{key_id}.p8"))
+  File.binwrite(path, body)
+  File.chmod(0600, path)
+  UI.user_error!("ASC key file is empty") if !File.file?(path) || File.empty?(path)
+  UI.user_error!("ASC key path is not absolute") unless path.start_with?("/")
+  UI.message("ASC key format: #{kind}")
+  path
+end
+
+def load_api_key(key_id, issuer_id, key_b64)
+  path = write_asc_key(key_id, key_b64)
+  api_key = app_store_connect_api_key(
+    key_id: key_id,
+    issuer_id: issuer_id,
+    key_filepath: path,
+    duration: 1200,
+    in_house: false
+  )
+  [api_key, path]
+end
+
+def signing_material_dir
+  dir = ENV["RUNNER_TEMP"]
+  dir = Dir.tmpdir if dir.nil? || dir.strip.empty?
+  File.expand_path(dir)
+end
+
+# setup_ci / create_keychain record "~/Library/Keychains/<name>". The security
+# CLI writes "<name>-db". cert refuses a path that does not exist on disk.
+def signing_keychain_path
+  setup_ci if ENV["CI"]
+  raw = Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_PATH]
+  if raw.to_s.strip.empty?
+    ENV["MATCH_KEYCHAIN_NAME"] ||= "fastlane_tmp_keychain"
+    ENV["MATCH_KEYCHAIN_PASSWORD"] ||= ""
+    create_keychain(
+      name: ENV["MATCH_KEYCHAIN_NAME"],
+      password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: true,
+      add_to_search_list: true
+    )
+    raw = Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_PATH]
+  end
+  expanded = File.expand_path(raw.to_s)
+  resolved = ["#{expanded}-db", expanded].find { |candidate| File.exist?(candidate) }
+  UI.user_error!("temporary keychain was not created") if resolved.nil?
+  resolved
+end
+
+# Classify locally. Never interpolate the exception message: Spaceship puts
+# the response body in it, and that body can carry account details.
+def asc_role_or_auth!(error)
+  detail = "#{error.class.name}\n#{error.message}"
+  if detail.match?(/403|\bFORBIDDEN\b|Forbidden|not allowed/i)
+    UI.user_error!("App Store Connect API key cannot create a distribution certificate. The key role must be Admin.")
+  end
+  UI.user_error!("App Store Connect authentication failed.")
+end
+
+def marketing_version
+  path = File.expand_path("../app.config.json", __dir__)
+  version = JSON.parse(File.read(path))["version"].to_s.strip
+  UI.user_error!("marketing version missing") if version.empty?
+  version
+end
+
+# A display name from Apple ends with the team id in parentheses. The log
+# keeps the certificate name and drops that suffix.
+def distribution_certificate_label(cert)
+  name = cert.display_name.to_s.strip
+  name = cert.name.to_s.strip if name.empty?
+  name = name.sub(/\s+\([A-Za-z0-9]{10}\)\z/, "")
+  name = "Apple Distribution" if name.empty?
+  expiry = cert.expiration_date.to_s.strip
+  expiry = "unknown" if expiry.empty?
+  expired = expiry == "unknown" ? false : !cert.valid?
+  "#{name} expires #{expiry} expired=#{expired}"
+end
+
+def distribution_certificate_lines
+  listed = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: "DISTRIBUTION" })
+  listed.select { |cert| cert.certificate_type == "DISTRIBUTION" }.map { |cert| distribution_certificate_label(cert) }
+end
+
+# Authenticate, prove the key can see users (Admin), and stop before the
+# archive if the bundle id or the app record is missing. An existing Apple
+# Distribution certificate does not stop the run. Fastlane has no numeric
+# ceiling: get_certificates creates another certificate when the private key
+# is not in this keychain, and Apple refuses the create only when the team
+# is already at its limit. Returns the next TestFlight build number.
+def asc_prepare!(api_key)
+  if DistP12.base64_present? && !DistP12.password_present?
+    UI.user_error!("DIST_CERT_P12_BASE64 is set but DIST_CERT_P12_PASSWORD is empty.")
+  end
+  if DistP12.password_present? && !DistP12.base64_present?
+    UI.user_error!("DIST_CERT_P12_PASSWORD is set but DIST_CERT_P12_BASE64 is empty.")
+  end
+  if DistP12.configured?
+    begin
+      DistP12.decode(ENV["DIST_CERT_P12_BASE64"])
+    rescue DistP12::FormatError => e
+      UI.user_error!(e.message)
+    end
+  end
+
+  require "spaceship"
+  begin
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: api_key)
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+
+  begin
+    Spaceship::ConnectAPI.get_users(limit: 1, includes: nil)
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+
+  begin
+    bundle = Spaceship::ConnectAPI::BundleId.find(BUNDLE_ID)
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+  UI.user_error!("App Store Connect has no bundle id space.galaxymind.arcade.") if bundle.nil?
+
+  begin
+    app = Spaceship::ConnectAPI::App.find(BUNDLE_ID)
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+  UI.user_error!("App Store Connect has no app record for space.galaxymind.arcade.") if app.nil?
+
+  begin
+    lines = distribution_certificate_lines
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+  if lines.empty?
+    if DistP12.configured?
+      UI.message("No Apple Distribution certificate on the team. A saved certificate is configured and will be imported.")
+    else
+      UI.message("No Apple Distribution certificate on the team. The lane will create one.")
+    end
+  elsif DistP12.configured?
+    UI.message(
+      "Apple Distribution certificates already on the team. A saved certificate is configured and will be imported.\n#{lines.join("\n")}"
+    )
+  else
+    UI.message(
+      "Apple Distribution certificates already on the team. This lane does not have their private keys, so it will create another while Apple still accepts one.\n#{lines.join("\n")}"
+    )
+  end
+
+  version = marketing_version
+  begin
+    latest = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: BUNDLE_ID,
+      version: version,
+      initial_build_number: 0,
+      platform: "ios"
+    )
+  rescue StandardError => e
+    asc_role_or_auth!(e)
+  end
+  number = latest.to_i + 1
+  number = 2 if number < 2
+  UI.user_error!("TestFlight build number was not a number") if number < 2
+  File.write(File.join(signing_material_dir, "testflight-build-number"), "#{number}\n")
+  UI.message("Next TestFlight build number is #{number}.")
+  number.to_s
+end
+
+# Import a password-protected PKCS#12 into the temporary keychain before cert
+# looks for an installed Apple Distribution identity. security(1) imports
+# that PKCS#12. The command is not printed.
+def import_saved_distribution_p12(keychain_path, keychain_password)
+  return unless DistP12.configured?
+  dir = signing_material_dir
+  p12_path = File.join(dir, "import-distribution.p12")
+  ok = false
+  begin
+    DistP12.write_file(ENV["DIST_CERT_P12_BASE64"], p12_path)
+    DistP12.import_pkcs12(p12_path, DistP12.password, keychain_path)
+    ok = true
+    if ok
+      _out3, _err3, listed = Open3.capture3(
+        "security", "set-key-partition-list",
+        "-S", "apple-tool:,apple:,codesign:",
+        "-s",
+        "-k", keychain_password.to_s,
+        keychain_path
+      )
+      ok = listed.success?
+    end
+  rescue DistP12::FormatError => e
+    UI.user_error!(e.message)
+  ensure
+    File.delete(p12_path) if File.exist?(p12_path)
+  end
+  unless ok
+    UI.user_error!("Could not import the distribution certificate. Check DIST_CERT_P12_BASE64 and DIST_CERT_P12_PASSWORD.")
+  end
+  UI.message("Imported the saved distribution certificate. This run will not create another.")
+end
+
+# cert writes the new private key as PEM in a file named {id}.p12, plus a
+# DER or PEM .cer. When no saved PKCS#12 is configured, package both into a
+# real PKCS#12 with a random password, prove that file imports, encrypt that
+# plus the password, and leave dist-cert.p12.gpg for the one-day artifact.
+# A failed import never reaches this method: the lane stops before
+# get_certificates. Packaging runs immediately after the create, and the
+# caller revokes the new certificate if this method raises.
+def package_distribution_p12(cert_id, force: false)
+  return if DistP12.configured? && !force
+  dir = signing_material_dir
+  pem = File.join(dir, "#{cert_id}.p12")
+  cer = File.join(dir, "#{cert_id}.cer")
+  p12_path = File.join(dir, "distribution.p12")
+  password_path = File.join(dir, "password.txt")
+  tar_path = File.join(dir, "dist-cert.tar")
+  gpg_path = File.join(dir, "dist-cert.p12.gpg")
+  gnupghome = File.join(dir, "gnupg")
+  password = SecureRandom.urlsafe_base64(32)
+  begin
+    unless File.file?(pem) && File.file?(cer) && !File.empty?(pem) && !File.empty?(cer)
+      UI.user_error!("Could not package the distribution certificate for reuse.")
+    end
+    begin
+      DistP12.export_identity(pem, cer, p12_path, password)
+      DistP12.verify_reusable!(p12_path, password)
+    rescue DistP12::FormatError => e
+      File.delete(p12_path) if File.exist?(p12_path)
+      UI.user_error!("Could not package the distribution certificate for reuse. #{e.message}")
+    end
+    File.binwrite(password_path, password)
+    File.chmod(0o600, password_path)
+    _tar_out, _tar_err, tar_status = Open3.capture3(
+      "tar", "-cf", tar_path, "-C", dir, "distribution.p12", "password.txt"
+    )
+    UI.user_error!("Could not package the distribution certificate for reuse.") unless tar_status.success?
+    File.chmod(0o600, tar_path)
+    Dir.mkdir(gnupghome) unless File.directory?(gnupghome)
+    File.chmod(0o700, gnupghome)
+    passphrase = DistP12.artifact_passphrase(ENV["ASC_KEY_ID"], ENV["ASC_KEY_P8"])
+    DistP12.encrypt_symmetric(tar_path, gpg_path, passphrase, gnupghome: gnupghome)
+    File.chmod(0o600, gpg_path)
+    UI.message("Encrypted distribution archive written. Artifact name dist-cert-p12, retained 1 day.")
+    UI.message("Passphrase is the SHA-256 hex of the trimmed ASC_KEY_ID, a newline, and ASC_KEY_P8 exactly as stored. ios-arcade/README.md has the decrypt steps.")
+    UI.message("Add repository secrets DIST_CERT_P12_PASSWORD and DIST_CERT_P12_BASE64, then delete the artifact.")
+  rescue DistP12::FormatError => e
+    File.delete(gpg_path) if File.exist?(gpg_path)
+    UI.user_error!(e.message)
+  ensure
+    ENV.delete(DistP12::EXPORT_ENV)
+    [pem, cer, p12_path, password_path, tar_path, File.join(dir, "#{cert_id}.certSigningRequest")].each do |path|
+      File.delete(path) if File.exist?(path)
+    end
+    FileUtils.rm_rf(gnupghome) if File.directory?(gnupghome)
+  end
+end
+
+# The certificate was issued before packaging. If the key cannot be saved,
+# delete that certificate so the team slot is free again. Only call this
+# for a certificate this run created. The exception class is the only
+# detail that is safe to log.
+def revoke_distribution_certificate!(cert_id)
+  UI.message("Packaging failed. Revoking the certificate this run created.")
+  begin
+    require "spaceship"
+    listed = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: "DISTRIBUTION" })
+    cert = listed.find { |item| item.id == cert_id && item.certificate_type == "DISTRIBUTION" }
+    if cert.nil?
+      UI.important("The certificate this run created was not revoked. Revoke it in App Store Connect if it is still there.")
+      return
+    end
+    cert.delete!
+    UI.message("Revoked the certificate this run created.")
+  rescue StandardError => e
+    UI.important("Could not revoke the certificate this run created (#{e.class.name}). Revoke it in App Store Connect before the next run.")
+  end
+end
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Authenticate and list distribution certificates before the archive"
+  lane :preflight do
+    key_id = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_b64 = ENV.fetch("ASC_KEY_P8")
+    api_key, _key_path = load_api_key(key_id, issuer_id, key_b64)
+    asc_prepare!(api_key)
+  end
+
+  desc "Sign with an App Store profile and upload to TestFlight"
+  lane :beta do
+    key_id = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_b64 = ENV.fetch("ASC_KEY_P8")
+    team_id = ENV.fetch("APPLE_TEAM_ID")
+
+    api_key, _key_path = load_api_key(key_id, issuer_id, key_b64)
+    build_number = asc_prepare!(api_key)
+
+    # Packaging tools are required before a create, so a missing gpg cannot
+    # burn a certificate. Import uses openssl, which the workflow already ran.
+    unless DistP12.configured?
+      begin
+        DistP12.require_tool!("gpg")
+        DistP12.require_tool!("tar")
+        DistP12.require_tool!("openssl")
+      rescue DistP12::FormatError => e
+        UI.user_error!("#{e.message}. The lane will not create a certificate until packaging tools are present.")
+      end
+    end
+
+    # The private key enters this keychain from the saved PKCS#12, or from
+    # cert when no saved archive is configured.
+    keychain_path = signing_keychain_path
+    keychain_password = ENV.fetch("MATCH_KEYCHAIN_PASSWORD", "")
+    material_dir = signing_material_dir
+    import_saved_distribution_p12(keychain_path, keychain_password)
+
+    # iOS distribution certificate. cert's :type is Mac-only (installer and
+    # Developer ID) and rejects the string "distribution". Passing development
+    # as false, with the default generate_apple_certs flag, creates Apple Distribution.
+    # An imported identity is reused. cert creates one only when the keychain
+    # has no matching private key.
+    begin
+      get_certificates(
+        api_key: api_key,
+        development: false,
+        team_id: team_id,
+        keychain_path: keychain_path,
+        keychain_password: keychain_password,
+        output_path: material_dir
+      )
+    rescue StandardError => e
+      detail = e.message.to_s
+      if detail.include?("reached the maximum number") || detail.include?("You already have a current")
+        begin
+          lines = distribution_certificate_lines
+        rescue StandardError
+          lines = []
+        end
+        listed = lines.empty? ? "Apple did not return a certificate list." : lines.join("\n")
+        UI.user_error!(
+          "Apple refused another Apple Distribution certificate. This lane cannot use the certificates already on the team.\n" \
+          "#{listed}\n" \
+          "Revoke one of them, then run the workflow again."
+        )
+      end
+      raise
+    end
+    cert_id = Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::CERT_CERTIFICATE_ID]
+    UI.user_error!("distribution certificate id missing") unless cert_id.to_s.match?(/\A[A-Za-z0-9]+\z/)
+    created_key = File.join(material_dir, "#{cert_id}.p12")
+    created_here = File.file?(created_key)
+    begin
+      if DistP12.configured? && created_here
+        UI.message("The saved certificate was not reused, so this run created one. The existing secrets were not changed.")
+        package_distribution_p12(cert_id, force: true)
+      else
+        package_distribution_p12(cert_id)
+      end
+    rescue StandardError
+      revoke_distribution_certificate!(cert_id) if created_here
+      raise
+    end
+
+    # Neither adhoc nor development. Fastlane 2.228 treats both keys as set
+    # even when the values are false, and those two options conflict. With
+    # neither key present the profile type is app-store.
+    get_provisioning_profile(
+      api_key: api_key,
+      app_identifier: BUNDLE_ID,
+      team_id: team_id,
+      cert_id: cert_id,
+      output_path: material_dir
+    )
+    profile_name = Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_NAME]
+    UI.user_error!("provisioning profile name missing") if profile_name.to_s.strip.empty?
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/App/App.xcodeproj",
+      targets: ["App"],
+      build_configurations: ["Release"],
+      team_id: team_id,
+      code_sign_identity: "Apple Distribution",
+      profile_name: profile_name
+    )
+
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: "ios/App/App.xcodeproj"
+    )
+
+    build_app(
+      workspace: "ios/App/App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      skip_profile_detection: true,
+      export_options: {
+        method: "app-store",
+        signingStyle: "manual",
+        signingCertificate: "Apple Distribution",
+        teamID: team_id,
+        provisioningProfiles: {
+          BUNDLE_ID => profile_name
+        }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: BUNDLE_ID,
+      skip_waiting_for_build_processing: true,
+      distribute_external: false,
+      uses_non_exempt_encryption: false
+    )
+
+    UI.success("Uploaded build #{build_number}. Apple still has to process it.")
+  end
+
+  desc "Upload metadata and screenshots. Not used by the GitHub workflow."
+  lane :metadata do
+    key_id = ENV.fetch("ASC_KEY_ID")
+    issuer_id = ENV.fetch("ASC_ISSUER_ID")
+    key_b64 = ENV.fetch("ASC_KEY_P8")
+    api_key, _key_path = load_api_key(key_id, issuer_id, key_b64)
+    deliver(api_key: api_key)
+  end
+end

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  SIX DEEP · gray-box prototype (cabinet #8 candidate · 2026-07-27)
+
+  FUN GATE: this build exists to answer ONE question on a phone —
+  is lane-change + depth-dive through a block corridor fun as gray
+  boxes? Nothing here is final art. If the answer is no, the concept
+  pivots before any content is authored (adversarial review rule).
+
+  DESIGN CONTRACT (from the 2026-07-26 live-data research):
+  · World seeded by the LIVE chain tip (block height via /api/heartbeat ·
+    proxied through our own CDN so the CSP never names a third party).
+  · DEPTH = CONFIRMATIONS: three flight layers labeled 0-CONF / 3-CONF /
+    6-CONF. Shallow is fast and exposed, deep is safe and slow — the
+    ambient-education rule: the mechanic teaches, never text.
+  · A SEAL GATE every block-length: thread the one gap or get reorged.
+    Passing one = +1 DEEP. Score is "N DEEP" · confirmations survived.
+  · Block arrival is punctuation, never the loop (P(block in 90s) ≈ 14%).
+
+  Renderer: gl.js + math3d.js forked verbatim from bitcoin-kart.
+  UNLISTED: noindex, no nav/sitemap/arcade entries while prototype.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0B">
+<title>SIX DEEP · gray-box · Galaxy Mind Arcade</title>
+<!-- Share + structured data (SEO desk fix, 2026-10-18). The robots noindex
+     above stays until the operator takes the cabinet out of gray-box; this
+     block only fixes the empty description and bare link unfurls. -->
+<meta name="description" content="SIX DEEP is a free browser prototype where you fly through a corridor of bitcoin blocks. Swap lanes, change depth and thread every seal gate to get six confirmations deep.">
+<link rel="canonical" href="https://galaxymind.space/six-deep">
+<meta property="og:title" content="SIX DEEP · a bitcoin confirmations game (prototype)">
+<meta property="og:description" content="Fly through a corridor of bitcoin blocks, thread every seal gate and see how many confirmations deep you can get. A free gray-box prototype from the Galaxy Mind Arcade.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://galaxymind.space/six-deep">
+<meta property="og:site_name" content="Galaxy Mind">
+<meta property="og:image" content="https://galaxymind.space/arcade/opengraph-image">
+<meta property="og:image:alt" content="The Galaxy Mind Arcade share card, showing its free bitcoin browser games.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@GalaxyMind">
+<meta name="twitter:title" content="SIX DEEP · a bitcoin confirmations game (prototype)">
+<meta name="twitter:description" content="Fly through a corridor of bitcoin blocks and see how many confirmations deep you can get. Free, in your browser.">
+<meta name="twitter:image" content="https://galaxymind.space/arcade/opengraph-image">
+<meta name="twitter:image:alt" content="The Galaxy Mind Arcade share card, showing its free bitcoin browser games.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":["VideoGame","WebApplication"],"@id":"https://galaxymind.space/six-deep#game",
+  "name":"SIX DEEP","url":"https://galaxymind.space/six-deep",
+  "description":"A free browser prototype where you fly through a corridor of bitcoin blocks. Swap lanes, change depth and thread every seal gate to get six confirmations deep.",
+  "genre":["Arcade","Endless runner"],"gamePlatform":"Web browser","playMode":"SinglePlayer",
+  "applicationCategory":"GameApplication","operatingSystem":"Any (web browser)",
+  "isAccessibleForFree":true,
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "author":{"@id":"https://galaxymind.space/#org"},
+  "publisher":{"@id":"https://galaxymind.space/#org"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Galaxy Mind","item":"https://galaxymind.space/"},
+  {"@type":"ListItem","position":2,"name":"Arcade","item":"https://galaxymind.space/arcade"},
+  {"@type":"ListItem","position":3,"name":"SIX DEEP","item":"https://galaxymind.space/six-deep"}]}
+]}
+</script>
+<link rel="stylesheet" href="/six-deep/style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="hud">
+    <div id="depth" class="hud-depth">0 DEEP</div>
+    <div id="world" class="hud-world">SYNCING THE TIP…</div>
+    <div id="layer" class="hud-layer">0-CONF · FAST · EXPOSED</div>
+  </div>
+  <div id="overlay">
+    <div class="panel">
+      <h1>SIX <span class="orange">DEEP</span></h1>
+      <p class="tag">gray-box prototype · nothing here is final art</p>
+      <p id="worldline" class="world">world · syncing the chain tip…</p>
+      <p class="how">
+        ◀ ▶ swap lanes · ▲ ▼ change depth<br>
+        phone: tap left/right halves · swipe up/down<br>
+        0-CONF pays 3× but the mempool is a mess down there.<br>
+        Thread every seal gate. Get 6 deep. Then keep going.
+      </p>
+      <button id="go">DROP IN</button>
+    </div>
+  </div>
+  <div id="results" hidden>
+    <div class="panel">
+      <h1 class="orange">REORG&apos;D</h1>
+      <p id="score" class="score">0 DEEP</p>
+      <p id="detail" class="world"></p>
+      <button id="retry">SAME WORLD</button>
+      <button id="fresh">NEXT WORLD →</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="/six-deep/js/game.js"></script>
+</body>
+</html>

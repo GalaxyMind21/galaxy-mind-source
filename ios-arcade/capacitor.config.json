@@ -1,0 +1,14 @@
+{
+  "appId": "space.galaxymind.arcade",
+  "appName": "Bitcoin Games",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#12110F",
+    "scrollEnabled": true,
+    "zoomEnabled": false
+  }
+}

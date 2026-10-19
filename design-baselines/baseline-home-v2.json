@@ -1,0 +1,469 @@
+{
+  "label": "baseline-home-v2",
+  "url": "https://galaxymind.space/",
+  "primarySelector": "[data-vendor-grid] > *",
+  "measuredAt": "2026-08-23T12:26:50.542Z",
+  "viewports": {
+    "mobile": {
+      "viewportPx": [
+        390,
+        844
+      ],
+      "contentReach": {
+        "primarySelector": "[data-vendor-grid] > *",
+        "primaryFound": true,
+        "pxToPrimary": 2229,
+        "screensToPrimary": 2.64,
+        "primaryAboveFold": false
+      },
+      "scale": {
+        "pageHeightPx": 39726,
+        "screensTall": 47.1,
+        "domNodes": 3112
+      },
+      "aboveFold": {
+        "interactiveCount": 20,
+        "primaryItemsInFold": 0,
+        "interactiveLabels": [
+          "Galaxy Mind home",
+          "Search · jump to any vendor, tool, or te",
+          "Switch to light theme",
+          "Support Galaxy Mind",
+          "+Submit a vendorSubmit→",
+          "human-verified",
+          "Listed on bitcoin.org",
+          "BTC SPOT·$77,101",
+          "Rigly Block Partyhardware",
+          "BitBrandcollectibles",
+          "The Belief Machinebooks",
+          "Today's Buying Gauge →",
+          "Embed it",
+          "$Spend",
+          "◉Today",
+          "Play. 6 daily games open.",
+          "◐Buy?",
+          "≡More",
+          "✉Get the signal",
+          "Dismiss the alerts chip for 30 days"
+        ]
+      },
+      "chrome": {
+        "pinnedCount": 5,
+        "pinnedPx": 295,
+        "pinnedRatio": 0.35,
+        "pinned": [
+          {
+            "h": 61,
+            "pos": "sticky",
+            "text": "₿GALAXY MINDSpendInstrumentsArcadeLearn₿$77K"
+          },
+          {
+            "h": 90,
+            "pos": "sticky",
+            "text": "CategoryAll132Apparel25General goods1Hardwar"
+          },
+          {
+            "h": 62,
+            "pos": "fixed",
+            "text": "$Spend◉Today▶6Play◐Buy?≡More"
+          },
+          {
+            "h": 47,
+            "pos": "fixed",
+            "text": "↑"
+          },
+          {
+            "h": 35,
+            "pos": "fixed",
+            "text": "✉Get the signal×"
+          }
+        ]
+      },
+      "entropy": {
+        "fontSizes": 15,
+        "fontWeights": 4,
+        "letterSpacings": 21,
+        "borderRadii": 10,
+        "boxShadows": 10,
+        "colors": 21,
+        "fontFamilies": 3,
+        "total": 60,
+        "monoUppercaseCharRatio": 0.619,
+        "topFontSizes": [
+          [
+            "18.0625px",
+            1253
+          ],
+          [
+            "12px",
+            871
+          ],
+          [
+            "13px",
+            186
+          ],
+          [
+            "14.875px",
+            154
+          ],
+          [
+            "17px",
+            136
+          ],
+          [
+            "20px",
+            132
+          ],
+          [
+            "12.75px",
+            28
+          ],
+          [
+            "10px",
+            16
+          ],
+          [
+            "19.125px",
+            7
+          ],
+          [
+            "11px",
+            6
+          ],
+          [
+            "25.5px",
+            5
+          ],
+          [
+            "32.3px",
+            4
+          ]
+        ]
+      },
+      "a11y": {
+        "h1Count": 1,
+        "headingCount": 6,
+        "headingLevelSkips": 0,
+        "headingsPer1000px": 0.15,
+        "outline": [
+          "H1 Spend bitcoin.",
+          "H2 All verified merchants",
+          "H3 Golden Tallow",
+          "H3 The newest 4 on the directory",
+          "H2 Know a Bitcoin vendor we're missing?",
+          "H3 More from Galaxy Mind"
+        ],
+        "tapTargetsTotal": 438,
+        "tapTargetsUnder44": 251,
+        "smallestTargets": [
+          {
+            "label": "Skip to content",
+            "size": [
+              1,
+              1
+            ]
+          },
+          {
+            "label": "Filter directory to 🇮🇹 Italy · 3 vendo",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇩🇪 Germany · 5 ven",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇨🇦 Canada · 5 vend",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇭🇺 Hungary · 1 ven",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇪🇸 Spain · 1 vendo",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇦🇺 Australia · 1 v",
+            "size": [
+              9,
+              9
+            ]
+          },
+          {
+            "label": "Filter directory to 🇹🇭 Thailand · 1 ve",
+            "size": [
+              9,
+              9
+            ]
+          }
+        ],
+        "contrastSamples": 600,
+        "contrastFailures": 0,
+        "worstContrast": []
+      },
+      "perf": {
+        "loadMs": 2465,
+        "lcpMs": 3096,
+        "cls": 0.0404,
+        "longTasks": 1,
+        "longTaskMs": 51,
+        "firstInteractionMs": 15
+      },
+      "score": {
+        "reach": 12,
+        "focus": 22,
+        "chrome": 20,
+        "entropy": 75,
+        "a11y": 80,
+        "perf": 76,
+        "overall": 48
+      }
+    },
+    "desktop": {
+      "viewportPx": [
+        1440,
+        900
+      ],
+      "contentReach": {
+        "primarySelector": "[data-vendor-grid] > *",
+        "primaryFound": true,
+        "pxToPrimary": 1472,
+        "screensToPrimary": 1.64,
+        "primaryAboveFold": false
+      },
+      "scale": {
+        "pageHeightPx": 14344,
+        "screensTall": 15.9,
+        "domNodes": 3110
+      },
+      "aboveFold": {
+        "interactiveCount": 26,
+        "primaryItemsInFold": 0,
+        "interactiveLabels": [
+          "Galaxy Mind home",
+          "Spend",
+          "Instruments",
+          "Arcade",
+          "Learn",
+          "WEN #47 is open · date today's tape",
+          "Search · jump to any vendor, tool, or te",
+          "Switch to light theme",
+          "Support Galaxy Mind",
+          "+Submit a vendorSubmit→",
+          "human-verified",
+          "Listed on bitcoin.org",
+          "Rigly Block Partyhardware",
+          "BitBrandcollectibles",
+          "The Belief Machinebooks",
+          "Get notified when we hit it →",
+          "Today's Buying Gauge →",
+          "Embed it",
+          "+ Submit a vendor",
+          "Email address",
+          "Subscribe →",
+          "Pick yours →",
+          "Search vendors",
+          "Browsing the full list of online stores ",
+          "✉Get the signal",
+          "Dismiss the alerts chip for 30 days"
+        ]
+      },
+      "chrome": {
+        "pinnedCount": 2,
+        "pinnedPx": 120,
+        "pinnedRatio": 0.133,
+        "pinned": [
+          {
+            "h": 69,
+            "pos": "sticky",
+            "text": "₿GALAXY MINDSpendInstrumentsArcadeLearn₿$77K"
+          },
+          {
+            "h": 51,
+            "pos": "fixed",
+            "text": "↑"
+          }
+        ]
+      },
+      "entropy": {
+        "fontSizes": 16,
+        "fontWeights": 4,
+        "letterSpacings": 26,
+        "borderRadii": 10,
+        "boxShadows": 13,
+        "colors": 23,
+        "fontFamilies": 3,
+        "total": 69,
+        "monoUppercaseCharRatio": 0.513,
+        "topFontSizes": [
+          [
+            "18.0625px",
+            1253
+          ],
+          [
+            "12px",
+            861
+          ],
+          [
+            "17px",
+            265
+          ],
+          [
+            "13px",
+            186
+          ],
+          [
+            "19.125px",
+            139
+          ],
+          [
+            "12.75px",
+            63
+          ],
+          [
+            "14.875px",
+            22
+          ],
+          [
+            "10px",
+            15
+          ],
+          [
+            "11px",
+            14
+          ],
+          [
+            "21.25px",
+            7
+          ],
+          [
+            "31.875px",
+            5
+          ],
+          [
+            "42.5px",
+            4
+          ]
+        ]
+      },
+      "a11y": {
+        "h1Count": 1,
+        "headingCount": 6,
+        "headingLevelSkips": 0,
+        "headingsPer1000px": 0.42,
+        "outline": [
+          "H1 Spend bitcoin.",
+          "H2 All verified merchants",
+          "H3 Golden Tallow",
+          "H3 The newest 4 on the directory",
+          "H2 Know a Bitcoin vendor we're missing?",
+          "H3 More from Galaxy Mind"
+        ],
+        "tapTargetsTotal": 440,
+        "tapTargetsUnder44": 290,
+        "smallestTargets": [
+          {
+            "label": "Skip to content",
+            "size": [
+              1,
+              1
+            ]
+          },
+          {
+            "label": "𝕏",
+            "size": [
+              11,
+              18
+            ]
+          },
+          {
+            "label": "FAQ",
+            "size": [
+              25,
+              20
+            ]
+          },
+          {
+            "label": "Italy",
+            "size": [
+              22,
+              28
+            ]
+          },
+          {
+            "label": "X →",
+            "size": [
+              34,
+              20
+            ]
+          },
+          {
+            "label": "Peru",
+            "size": [
+              26,
+              28
+            ]
+          },
+          {
+            "label": "FAQ",
+            "size": [
+              29,
+              27
+            ]
+          },
+          {
+            "label": "WEN",
+            "size": [
+              29,
+              28
+            ]
+          }
+        ],
+        "contrastSamples": 600,
+        "contrastFailures": 1,
+        "worstContrast": [
+          {
+            "ratio": 1.06,
+            "px": 12,
+            "large": false,
+            "required": 4.5,
+            "text": "Tip: ←/→ to browse · Enter to expand · Esc t"
+          }
+        ]
+      },
+      "perf": {
+        "loadMs": 1623,
+        "lcpMs": 424,
+        "cls": 0.0027,
+        "longTasks": 1,
+        "longTaskMs": 56,
+        "firstInteractionMs": 3.2
+      },
+      "score": {
+        "reach": 45,
+        "focus": 0,
+        "chrome": 100,
+        "entropy": 64,
+        "a11y": 78,
+        "perf": 100,
+        "overall": 65
+      }
+    }
+  }
+}

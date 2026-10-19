@@ -1,0 +1,5 @@
+# Pins fastlane for the macOS TestFlight workflow.
+# Cloud signing uses an App Store Connect API key. Do not add match.
+source "https://rubygems.org"
+
+gem "fastlane", "2.241.1"

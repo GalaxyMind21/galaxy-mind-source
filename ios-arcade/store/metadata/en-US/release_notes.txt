@@ -1,0 +1,1 @@
+First release. Eight offline games. Scores stay on this device.

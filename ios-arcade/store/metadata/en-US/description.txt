@@ -1,0 +1,23 @@
+Eight bitcoin games that play offline.
+No ads, no account, and no wallet.
+Scores are play points, not real bitcoin.
+
+Bitcoin Kart. A 3D racer on twelve tracks, with on-screen touch controls.
+
+Super Saylor. A 21-level platformer through bitcoin history. Unofficial parody.
+
+CHOP. Swipe through cubes drawn from a saved real block. Not the live chain tip.
+
+WEN. Date a 90-day slice of saved price history.
+
+The Bitcoin Gauntlet. A hidden stretch of that history against a simple buy-and-hold bot. Not a brokerage.
+
+Node Runner. One-tap jumps over the shape of the price tape.
+
+Timechain. Stack blocks. The points get smaller as you climb.
+
+The HODL Trail. Ten choices through bitcoin history.
+
+Plays with no network after install. No ads, no account, no tracking, and no wallet.
+
+https://galaxymind.space

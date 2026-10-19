@@ -1,0 +1,39 @@
+# gitleaks config: the default rules, plus narrow allowlists for reviewed test fixtures and public constants.
+# Each allowlist needs BOTH the file and the line pattern to match, so a real secret in the same file still fails.
+# Reviewed by security review 2026-10-18 (security/oss-review-galaxy-mind.md §1): none of these is a credential.
+title = "galaxy-mind gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "SETUP.md curl examples use the YOUR_CRON_SECRET placeholder"
+condition = "AND"
+regexTarget = "line"
+paths = ['''^docs/SETUP\.md$''']
+regexes = ['''YOUR_CRON_SECRET|curl https://galaxymind\.space/api/cron/''']
+
+[[allowlists]]
+description = "test-only secrets set inside the test process"
+condition = "AND"
+regexTarget = "line"
+paths = ['''^scripts/test-(arcade-identity|phase2-rentals|human-checkout|solana-rail)\.ts$''']
+regexes = ['''"test-secret-0123456789abcdef"|process\.env\.CRON_SECRET = "cron-test|#s=SECRET|api-key=abcdefghijklmnop0123|\$\{K\}|abcdefghijklmnop''']
+
+[[allowlists]]
+description = "public keccak topic of the USDC AuthorizationUsed event"
+condition = "AND"
+regexTarget = "line"
+paths = ['''^src/lib/rentals/phase2/x402\.ts$''']
+regexes = ['''AUTH_USED_TOPIC = "0x98de503528ee59b575ef0c0a2576a82497bfc029a5685b209e9ec333479b10a5"''']
+
+[[allowlists]]
+description = "a localStorage key name"
+condition = "AND"
+regexTarget = "line"
+paths = ['''^src/lib/vendor-journey\.ts$''']
+regexes = ['''LS_KEY = "gm_vendor_journey_v1"''']
+
+[[allowlists]]
+description = "dependencies and build output are not repo content"
+paths = ['''(^|/)node_modules/''', '''^\.next/''', '''^package-lock\.json$''']

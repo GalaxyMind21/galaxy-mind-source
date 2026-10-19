@@ -1,0 +1,935 @@
+{
+ "_doc": "BUILD vectors = test-vectors-v3.1.json (a635d1b9, unchanged) + PLAN \u00a718 carry-forwards from the security review final PASS (2026-10-17). Site, gm-btc-agent, rental-poller and the floor writer MUST pass every case that applies to them.",
+ "min_sat_formula": "ceil(F * 27 * 103 * rigs * days / 10000)",
+ "ask_sat_formula": "ceil(A * 27 * 985 * rigs * days / 100000)",
+ "amount_sat": "max(ask_sat, min_sat)",
+ "required_confs": "amount_sat < 1000000 ? 1 : 2",
+ "sats": [
+  {
+   "id": "S1",
+   "F": 51551,
+   "rigs": 1,
+   "days": 1,
+   "min_sat": 14337
+  },
+  {
+   "id": "S2",
+   "F": 51551,
+   "rigs": 4,
+   "days": 7,
+   "min_sat": 401418
+  },
+  {
+   "id": "S3",
+   "F": 52000,
+   "rigs": 4,
+   "days": 7,
+   "min_sat": 404914
+  },
+  {
+   "id": "S4",
+   "F": 51551,
+   "rigs": 2,
+   "days": 3,
+   "min_sat": 86018
+  },
+  {
+   "id": "S5",
+   "F": 51000,
+   "rigs": 1,
+   "days": 1,
+   "min_sat": 14184
+  },
+  {
+   "id": "S6",
+   "F": 51551,
+   "A": 60000,
+   "rigs": 4,
+   "days": 7,
+   "ask_sat": 446796,
+   "amount_sat": 446796,
+   "required_confs": 1
+  },
+  {
+   "id": "S7",
+   "F": 51551,
+   "rigs": 4,
+   "days": 7,
+   "paid": 401417,
+   "expect": "reject:payment_below_floor"
+  },
+  {
+   "id": "S8",
+   "F": 51551,
+   "rigs": 4,
+   "days": 7,
+   "paid": 401418,
+   "expect": "accept"
+  },
+  {
+   "id": "S9",
+   "amount_sat": 999999,
+   "required_confs": 1
+  },
+  {
+   "id": "S10",
+   "amount_sat": 1000000,
+   "required_confs": 2
+  },
+  {
+   "id": "S11",
+   "job_required_confs": 1,
+   "amount_sat": 1200000,
+   "expect": "reject:btc_confs_mismatch (poller recomputes 2, job lower)"
+  }
+ ],
+ "floor": [
+  {
+   "id": "F1",
+   "note": "today's row in effect",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F2",
+   "note": "before 08:12 CT the previous CT day is in effect",
+   "quote_at": "2026-10-17T12:30:00Z",
+   "floor_day": "2026-10-16",
+   "F_signed": 51551,
+   "agent_now": "2026-10-17T12:31:00Z",
+   "poller_now": "2026-10-17T13:30:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F3",
+   "note": "today's date with yesterday's lower floor (Q2)",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 51551,
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "reject:floor_below_history",
+   "expect_poller": "reject:floor_below_history",
+   "expect_ntfy": [
+    "floor_mismatch"
+   ]
+  },
+  {
+   "id": "F4",
+   "note": "old quote, its own day was in effect (floor rule only; confirm_by/N3 bound separately)",
+   "quote_at": "2026-10-16T09:45:00Z",
+   "floor_day": "2026-10-15",
+   "F_signed": 51000,
+   "agent_now": "2026-10-16T09:46:00Z",
+   "poller_now": "2026-10-17T12:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F5",
+   "note": "quote in the evening of 10-16 CT signs 10-15",
+   "quote_at": "2026-10-16T23:15:00Z",
+   "floor_day": "2026-10-15",
+   "F_signed": 51000,
+   "agent_now": "2026-10-16T23:16:00Z",
+   "poller_now": "2026-10-17T00:15:00Z",
+   "expect_agent": "reject:floor_day_not_in_effect",
+   "expect_poller": "reject:floor_day_not_in_effect"
+  },
+  {
+   "id": "F6",
+   "note": "day row missing (writer has not appended 10-17)",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "refuse:floor_history_unavailable",
+   "expect_poller": "defer:floor_history_unavailable"
+  },
+  {
+   "id": "F7",
+   "note": "history unreadable",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "history_override": "UNREADABLE",
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "refuse:floor_history_unavailable",
+   "expect_poller": "defer:floor_history_unavailable"
+  },
+  {
+   "id": "F8",
+   "note": "future floor_day",
+   "quote_at": "2026-10-17T11:55:00Z",
+   "floor_day": "2026-10-18",
+   "F_signed": 53000,
+   "agent_now": "2026-10-17T11:56:00Z",
+   "poller_now": "2026-10-17T12:55:00Z",
+   "expect_agent": "reject:floor_day_invalid",
+   "expect_poller": "reject:floor_day_invalid"
+  },
+  {
+   "id": "F8b",
+   "note": "future day with a fresh quote; a forged 10-18 row in history must not help (checked FIRST)",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-18",
+   "F_signed": 53000,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T13:12:00Z"
+     }
+    ],
+    "2026-10-18": [
+     {
+      "F": 53000,
+      "first_seen_at": "2026-10-17T14:00:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "reject:floor_day_invalid",
+   "expect_poller": "reject:floor_day_invalid"
+  },
+  {
+   "id": "F9",
+   "note": "28 min after the 08:12 CT roll, previous day still within \u00b130 min",
+   "quote_at": "2026-10-17T13:40:00Z",
+   "floor_day": "2026-10-16",
+   "F_signed": 51551,
+   "agent_now": "2026-10-17T13:41:00Z",
+   "poller_now": "2026-10-17T14:40:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F10",
+   "note": "31 min after the roll, previous day no longer in effect",
+   "quote_at": "2026-10-17T13:43:00Z",
+   "floor_day": "2026-10-16",
+   "F_signed": 51551,
+   "agent_now": "2026-10-17T13:44:00Z",
+   "poller_now": "2026-10-17T14:43:00Z",
+   "expect_agent": "reject:floor_day_not_in_effect",
+   "expect_poller": "reject:floor_day_not_in_effect"
+  },
+  {
+   "id": "F11",
+   "note": "quote 18:55 CT on 10-16, provisioned after two more rolls (Q1 case)",
+   "quote_at": "2026-10-16T23:55:00Z",
+   "floor_day": "2026-10-16",
+   "F_signed": 51551,
+   "history_override": {
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T13:12:00Z"
+     }
+    ],
+    "2026-10-18": [
+     {
+      "F": 52500,
+      "first_seen_at": "2026-10-18T13:12:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-16T23:56:00Z",
+   "poller_now": "2026-10-18T14:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F12",
+   "note": "provisioning 3 days after the quote",
+   "quote_at": "2026-10-14T20:00:00Z",
+   "floor_day": "2026-10-14",
+   "F_signed": 50500,
+   "agent_now": "2026-10-14T20:01:00Z",
+   "poller_now": "2026-10-17T20:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F13",
+   "note": "day older than the one in effect",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-15",
+   "F_signed": 51000,
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "reject:floor_day_not_in_effect",
+   "expect_poller": "reject:floor_day_not_in_effect"
+  },
+  {
+   "id": "F14",
+   "note": "lower revision during the day; quote at the revised value",
+   "quote_at": "2026-10-17T18:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 51800,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T13:12:00Z"
+     },
+     {
+      "F": 51800,
+      "first_seen_at": "2026-10-17T17:00:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T18:01:00Z",
+   "poller_now": "2026-10-17T19:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F14b",
+   "note": "lower revision during the day; quote made before it at the first value",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T13:12:00Z"
+     },
+     {
+      "F": 51800,
+      "first_seen_at": "2026-10-17T17:00:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F14c",
+   "note": "signed value not among recorded values but above the day's lowest",
+   "quote_at": "2026-10-17T18:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 51900,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T13:12:00Z"
+     },
+     {
+      "F": 51800,
+      "first_seen_at": "2026-10-17T17:00:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T18:01:00Z",
+   "poller_now": "2026-10-17T19:00:00Z",
+   "expect_agent": "accept",
+   "expect_poller": "accept",
+   "expect_ntfy": [
+    "floor_mismatch"
+   ]
+  },
+  {
+   "id": "F15",
+   "note": "amount one sat below min_sat(F_signed)",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "rigs": 4,
+   "days": 7,
+   "paid": 404913,
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:00:00Z",
+   "expect_agent": "reject:payment_below_floor",
+   "expect_poller": "reject:payment_below_floor"
+  },
+  {
+   "id": "F16",
+   "note": "quote 13:00Z on today's row first seen 13:12Z (12 min later, outside +5)",
+   "quote_at": "2026-10-17T13:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "agent_now": "2026-10-17T13:01:00Z",
+   "poller_now": "2026-10-17T14:00:00Z",
+   "expect_agent": "refuse:floor_history_unavailable",
+   "expect_poller": "reject:floor_day_not_in_effect"
+  },
+  {
+   "id": "F17",
+   "note": "quote 13:10Z, today's row first seen 13:12Z (inside +5)",
+   "quote_at": "2026-10-17T13:10:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "agent_now": "2026-10-17T13:11:00Z",
+   "poller_now": "2026-10-17T14:10:00Z",
+   "expect_agent": "refuse:floor_history_unavailable",
+   "expect_poller": "accept"
+  },
+  {
+   "id": "F18",
+   "note": "poller: the day's row first seen 20 min after quote_at (late writer)",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "history_override": {
+    "2026-10-14": [
+     {
+      "F": 50500,
+      "first_seen_at": "2026-10-14T13:12:00Z"
+     }
+    ],
+    "2026-10-15": [
+     {
+      "F": 51000,
+      "first_seen_at": "2026-10-15T13:12:00Z"
+     }
+    ],
+    "2026-10-16": [
+     {
+      "F": 51551,
+      "first_seen_at": "2026-10-16T13:12:00Z"
+     }
+    ],
+    "2026-10-17": [
+     {
+      "F": 52000,
+      "first_seen_at": "2026-10-17T15:20:00Z"
+     }
+    ]
+   },
+   "agent_now": "2026-10-17T15:01:00Z",
+   "poller_now": "2026-10-17T16:30:00Z",
+   "expect_agent": "refuse:floor_history_unavailable",
+   "expect_poller": "reject:floor_day_not_in_effect"
+  }
+ ],
+ "deadline_p6": [
+  {
+   "id": "D1",
+   "case": "2-conf wait",
+   "signed_start": "2026-10-17T10:00:00Z",
+   "first_seen_job_iat": "2026-10-17T10:40:00Z",
+   "expect_deadline": "2026-10-17T12:00:00Z",
+   "note": "min(start, iat)+2h; job signed only after paid, block time never used"
+  },
+  {
+   "id": "D2",
+   "case": "3h node outage before paid",
+   "signed_start": "2026-10-17T13:05:00Z",
+   "first_seen_job_iat": "2026-10-17T13:05:00Z",
+   "payment_block_time": "2026-10-17T10:00:00Z",
+   "expect_deadline": "2026-10-17T15:05:00Z",
+   "note": "block time ignored; x402 rule would have given 12:00 (already past)"
+  },
+  {
+   "id": "D3",
+   "case": "re-offer with later iat keeps earlier deadline",
+   "signed_start": "2026-10-17T10:00:00Z",
+   "first_seen_job_iat": "2026-10-17T10:00:00Z",
+   "reoffer_iat": "2026-10-17T11:30:00Z",
+   "expect_deadline": "2026-10-17T12:00:00Z",
+   "note": "deadline only ever moves earlier (FIX1 rule kept)"
+  }
+ ],
+ "index": [
+  {
+   "id": "I1",
+   "index": 0,
+   "expect": "reject:btc_index_reserved (agent never attests, poller refuses, site refuses display)"
+  },
+  {
+   "id": "I2",
+   "agent_ledger_max": 41,
+   "expect_next_index": 42
+  }
+ ],
+ "floor_rule": "1) floor_day > CT_date(quote_at+5m) or > CT_date(now) -> reject floor_day_invalid (FIRST). 2) agent only: |now-quote_at| > 5 min -> refuse quote_at_skew (poller bounds quote_at via N3 instead). 3) history unreadable or no row for floor_day -> agent refuse / poller defer floor_history_unavailable. 4) effective(t) = latest floor_day whose earliest first_seen_at <= t; floor_day must be in {effective(quote_at-30m), effective(quote_at+5m)} else reject floor_day_not_in_effect. 5) F_signed >= min(recorded values for floor_day) else reject floor_below_history. 6) amount_sat >= min_sat(F_signed) else payment_below_floor. ntfy floor_mismatch whenever F_signed is not one of the recorded values for floor_day (independent of the result). History is evaluated as visible at 'now' (rows with first_seen_at <= now). Window is -30/+5 (\u00a718.1); F1-F15 results are unchanged under -30/+5.",
+ "floor_history": {
+  "2026-10-14": [
+   {
+    "F": 50500,
+    "first_seen_at": "2026-10-14T13:12:00Z"
+   }
+  ],
+  "2026-10-15": [
+   {
+    "F": 51000,
+    "first_seen_at": "2026-10-15T13:12:00Z"
+   }
+  ],
+  "2026-10-16": [
+   {
+    "F": 51551,
+    "first_seen_at": "2026-10-16T13:12:00Z"
+   }
+  ],
+  "2026-10-17": [
+   {
+    "F": 52000,
+    "first_seen_at": "2026-10-17T13:12:00Z"
+   }
+  ]
+ },
+ "agent_skew": [
+  {
+   "id": "A1",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "agent_now": "2026-10-17T15:05:01Z",
+   "expect_agent": "refuse:quote_at_skew"
+  },
+  {
+   "id": "A2",
+   "quote_at": "2026-10-17T15:00:00Z",
+   "agent_now": "2026-10-17T15:04:59Z",
+   "floor_day": "2026-10-17",
+   "F_signed": 52000,
+   "expect_agent": "accept"
+  }
+ ],
+ "floor_writer": [
+  {
+   "id": "W4",
+   "same_day_existing": [
+    52000
+   ],
+   "new_value": 51800,
+   "expect": "append second value with its first_seen_at + ntfy floor_intraday_change; day lowest becomes 51800"
+  },
+  {
+   "id": "W5",
+   "same_day_existing": [
+    52000
+   ],
+   "new_value": 52000,
+   "expect": "no-op (value already recorded)"
+  },
+  {
+   "id": "W6",
+   "history_days": 8,
+   "expect": "prune to the newest 7 floor_days on rewrite"
+  },
+  {
+   "id": "W7",
+   "source": "symlink | FIFO | > 65536 bytes",
+   "expect": "refuse (O_NOFOLLOW|O_NONBLOCK, fstat S_ISREG, size cap); nothing written; unit fails \u2192 OnFailure alert"
+  },
+  {
+   "id": "W1",
+   "prev_day_lowest": 52000,
+   "new_value": 62400,
+   "check": "5n<=6p: 312000<=312000; 5n>=4p: 312000>=208000",
+   "expect": "append"
+  },
+  {
+   "id": "W2",
+   "prev_day_lowest": 52000,
+   "new_value": 62401,
+   "check": "5n=312005 > 6p=312000",
+   "expect": "refuse: floor_jump, exit non-zero (OnFailure pushes); nothing written"
+  },
+  {
+   "id": "W3",
+   "prev_day_lowest": 52000,
+   "new_value": 41599,
+   "check": "5n=207995 < 4p=208000",
+   "expect": "refuse: floor_jump, exit non-zero"
+  },
+  {
+   "id": "W3b",
+   "prev_day_lowest": 52000,
+   "new_value": 41600,
+   "check": "5n=208000 >= 4p=208000",
+   "expect": "append"
+  },
+  {
+   "id": "W8",
+   "case": "intraday second value 51800 for an existing day",
+   "expect": "append + line in root-owned alert file /srv/gm-rental/shared-floor/alerts.jsonl (root 0640), relayed by the existing forwarder; exit 0"
+  },
+  {
+   "id": "W9",
+   "case": "floor_jump day 2026-10-18, then root runs gm-floor-history --accept-jump 2026-10-18",
+   "expect": "value appended with accepted_jump:true; CHANGES.log line written in both places; only root can run it (non-root \u2192 refuse)"
+  },
+  {
+   "id": "W10",
+   "case": "--accept-jump for a day other than the pending jump day",
+   "expect": "refuse"
+  },
+  {
+   "id": "W11",
+   "case": "writer attempts any socket other than AF_UNIX",
+   "expect": "EAFNOSUPPORT (RestrictAddressFamilies=AF_UNIX, PrivateNetwork=yes)"
+  }
+ ],
+ "changed_from_v3": {
+  "F1": "inputs re-based to CT/quote_at; still accept",
+  "F2": "inputs re-based (07:30 CT, prior day in effect); still accept",
+  "F3": "accept -> reject:floor_below_history + ntfy floor_mismatch",
+  "F4": "reject -> accept (floor rule only; confirm_by/N3 bound it separately)",
+  "F5": "reject reason floor_below_history -> floor_day_not_in_effect",
+  "F6": "accept -> agent refuse / poller defer floor_history_unavailable",
+  "F7": "unchanged (agent refuse / poller defer)",
+  "F8": "unchanged",
+  "F9": "re-based to the 08:12 CT roll (+28 min); still accept",
+  "F10": "re-based (+31 min); reason -> floor_day_not_in_effect",
+  "F11": "reject -> accept",
+  "new": [
+   "F8b",
+   "F12",
+   "F13",
+   "F14",
+   "F14b",
+   "F14c",
+   "F15",
+   "A1",
+   "A2",
+   "W1-W7",
+   "J1-J9"
+  ]
+ },
+ "job_btc": [
+  {
+   "id": "J1",
+   "payment.network": "bip122:000000000019d6689c085ae165831e93",
+   "rail": "btc_onchain",
+   "expect": "schema ok"
+  },
+  {
+   "id": "J2",
+   "payment.network": "eip155:8453",
+   "rail": "btc_onchain",
+   "expect": "reject:schema_payment (network not allowed for rail)"
+  },
+  {
+   "id": "J3",
+   "rail": "btc_lightning",
+   "expect": "reject:schema_payment (rail not in allowlist)"
+  },
+  {
+   "id": "J4",
+   "outpoint.txid": "0x5f2c0b8e1d4a7c3b9e6f0a1d2c3b4a5968778695a4b3c2d1e0f9a8b7c6d5e4f3",
+   "expect": "reject:schema_payment (txid must match ^[0-9a-f]{64}$)"
+  },
+  {
+   "id": "J5",
+   "outpoint.txid": "5F2C0B8E1D4A7C3B9E6F0A1D2C3B4A5968778695A4B3C2D1E0F9A8B7C6D5E4F3",
+   "expect": "reject:schema_payment (lowercase only)"
+  },
+  {
+   "id": "J6",
+   "case": "re-signed BTC job: same order_ref + binding_id, new job_id/nonce",
+   "expect": "dedupe via applyKey order_ref|action|btc:<binding_id>; local order payment_id == 'btc:<binding_id>'; no order_conflict"
+  },
+  {
+   "id": "J7",
+   "case": "same order_ref, different binding_id on a route job",
+   "expect": "reject:order_conflict"
+  },
+  {
+   "id": "J8",
+   "case": "btc job, prod profile",
+   "expect": "is_mainnet(payment) true via rail+network (bip122 genesis); S1 reserved-name and outside-pool checks apply exactly as for eip155:8453"
+  },
+  {
+   "id": "J9",
+   "case": "signature valid, schema fails (any rail)",
+   "expect": "reject:schema_* AND ntfy SIGNED-JOB-SCHEMA-REJECT (possible paid-not-provisioned)"
+  },
+  {
+   "id": "J10",
+   "rail": "btc_onchain",
+   "top.pay_to": "0xAe80\u2026",
+   "expect": "reject:schema_settlement (BTC top-level pay_to must be null)"
+  },
+  {
+   "id": "J11",
+   "rail": "btc_onchain",
+   "top.amount_usdc": "1.000000",
+   "expect": "reject:schema_settlement (must be null)"
+  },
+  {
+   "id": "J12",
+   "rail": "btc_onchain",
+   "top.floor_btc_per_ph_day": "0.00052000",
+   "payment.floor_btc_per_ph_day": "0.00051551",
+   "expect": "reject:schema_payment (top-level floor must equal payment floor)"
+  },
+  {
+   "id": "J13",
+   "rail": "btc_onchain",
+   "payment.network_len": 39,
+   "expect": "schema ok (no 32-char network cap on BTC)"
+  },
+  {
+   "id": "J14",
+   "binding_id": "6F1C2A7E-3B0D-4C55-9A51-2F7D0E9B8C41",
+   "expect": "reject:schema_payment (lowercase UUID ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$)"
+  },
+  {
+   "id": "J15",
+   "binding_id": "6f1c2a7e-3b0d-4c55-9a51-2f7d0e9b8c41",
+   "payment_id": "btc:6f1c2a7e-3b0d-4c55-9a51-2f7d0e9b8c42",
+   "expect": "reject:schema_payment (payment_id !== 'btc:'+binding_id)"
+  },
+  {
+   "id": "J16",
+   "rail": "x402_usdc",
+   "case": "the existing rev 1.5/1.6 x402 suite",
+   "expect": "passes unchanged"
+  },
+  {
+   "id": "J17",
+   "rail": "x402_usdc",
+   "payment.unit": "sat",
+   "expect": "reject (x402 unit must be usdc_6dp)"
+  },
+  {
+   "id": "J18",
+   "rail": "lightning",
+   "expect": "reject (lightning dropped from the rail allowlist)"
+  },
+  {
+   "id": "J19",
+   "case": "cross-rail mutations: any BTC key on x402 (binding_id, outpoints, payment_id, index, address, ...) or any x402 key on BTC (tx_hash, provider_ref, amount_atomic)",
+   "expect": "reject every one"
+  },
+  {
+   "id": "J20",
+   "case": "x402 network outside the rev 1.6 allowlist",
+   "expect": "reject"
+  },
+  {
+   "id": "J21",
+   "case": "dedupe keys",
+   "x402": "order_ref|route|0x<64hex>",
+   "btc": "order_ref|route|btc:<uuid>",
+   "expect": "disjoint by construction (prefix '0x' vs 'btc:'); no collision possible"
+  },
+  {
+   "id": "J22",
+   "profile": "prod",
+   "payment.network": "bip122:00000008819873e925422c1ff0f99f7c",
+   "expect": "reject:schema_payment (prod accepts only bip122:000000000019d6689c085ae165831e93)"
+  },
+  {
+   "id": "J23",
+   "profile": "staging",
+   "payment.network": "bip122:000000000019d6689c085ae165831e93",
+   "expect": "reject:schema_payment (staging accepts only its pinned test-chain id)"
+  },
+  {
+   "id": "J24",
+   "case": "bad signature on a job whose schema is also wrong",
+   "expect": "reject:bad_signature; NO SIGNED-JOB-SCHEMA-REJECT ntfy"
+  },
+  {
+   "id": "J25",
+   "case": "signature ok, schema fails, re-offered 3 times (same job_id) and re-signed once (new job_id, same order_ref)",
+   "expect": "exactly one SIGNED-JOB-SCHEMA-REJECT ntfy (dedupe per job_id and order_ref)"
+  }
+ ],
+ "kill_mirror": [
+  {
+   "id": "K1",
+   "claim_status": {
+    "rentals_enabled": true,
+    "claimed_at": "now-10s",
+    "profile": "prod"
+   },
+   "owner": "gm-rental",
+   "mode": "0600",
+   "expect": "not killed"
+  },
+  {
+   "id": "K2",
+   "owner": "root",
+   "expect": "killed (owner must be the gm-rental uid)"
+  },
+  {
+   "id": "K3",
+   "mode": "0620",
+   "expect": "killed (mode & 022 != 0)"
+  },
+  {
+   "id": "K4",
+   "size_bytes": 4097,
+   "expect": "killed (> 4 KiB)"
+  },
+  {
+   "id": "K5",
+   "extra_key": "note",
+   "expect": "killed (exact keys {rentals_enabled, claimed_at, profile})"
+  },
+  {
+   "id": "K6",
+   "profile": "staging",
+   "expect": "killed (profile must be prod)"
+  },
+  {
+   "id": "K7",
+   "claimed_at": "now+61s",
+   "expect": "killed (future > 60 s)"
+  },
+  {
+   "id": "K8",
+   "claimed_at": "now+59s",
+   "expect": "not killed"
+  },
+  {
+   "id": "K9",
+   "claimed_at": "now-301s",
+   "expect": "killed (stale > 5 min)"
+  },
+  {
+   "id": "K10",
+   "kill_json_updated_at": "now+61s",
+   "reader": "gm-btc-agent",
+   "expect": "killed"
+  },
+  {
+   "id": "K11",
+   "case": "claim query errors",
+   "expect": "poller writes nothing; file ages out \u2192 killed after 5 min"
+  },
+  {
+   "id": "K12",
+   "case": "claim succeeded and returned rentals_enabled=false",
+   "expect": "poller writes rentals_enabled:false \u2192 killed"
+  },
+  {
+   "id": "K13",
+   "case": "DIRECT-RENTALS-DISABLED present, claim status true",
+   "expect": "killed (all sources ORed)"
+  },
+  {
+   "id": "K14",
+   "case": "rentals_enabled:\"true\" (string)",
+   "expect": "killed (must be boolean true)"
+  }
+ ],
+ "changed_from_v3_1": {
+  "window": "+30 \u2192 +5 (future check and in-effect set); F1-F15 unchanged",
+  "W1-W3": "restated as integer checks 5n<=6p and 5n>=4p, results unchanged; W2/W3 now also 'exit non-zero'",
+  "new": [
+   "F16",
+   "F17",
+   "F18",
+   "W3b",
+   "W8-W11",
+   "K1-K14",
+   "J10-J25"
+  ]
+ }
+}

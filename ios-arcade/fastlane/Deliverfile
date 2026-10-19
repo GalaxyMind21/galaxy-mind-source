@@ -1,0 +1,11 @@
+app_identifier "space.galaxymind.arcade"
+metadata_path "./store/metadata"
+screenshots_path "./store/screenshots"
+copyright "2026 Galaxy Mind"
+
+# The TestFlight lane uploads a binary only. Run `fastlane ios metadata`
+# by hand after the app record exists.
+skip_binary_upload true
+submit_for_review false
+force true
+precheck_include_in_app_purchases false

@@ -1,0 +1,308 @@
+/* Plus Jakarta Sans is the site face (SIL OFL 1.1, see fonts/OFL.txt). */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/PlusJakartaSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Night Bench tokens from src/app/globals.css. Dark is the site default. */
+:root {
+  color-scheme: dark;
+  --bg: #12110f;
+  --raised: #1c1a16;
+  --raised-press: #26231e;
+  --ink: #f2efe9;
+  --muted: #a5a096;
+  --accent: #f7931a;
+  --accent-ink: #1a1916;
+  --line: rgba(247, 238, 224, 0.085);
+  --font-site-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-site-sans);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+/* The document itself scrolls. A nested overflow box rubber-bands on
+   iOS 15 even when the web view's bounce is off. */
+body {
+  min-height: 100dvh;
+  overflow: visible;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.wrap {
+  min-height: 100dvh;
+  overflow: visible;
+  overscroll-behavior: none;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  touch-action: manipulation;
+}
+
+.brand:active { opacity: 0.65; }
+
+h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+.lede {
+  margin: 8px 0 0;
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+@media (min-width: 700px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  min-height: 118px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: inset 0 1px 0 rgba(247, 238, 224, 0.14);
+  text-decoration: none;
+  color: inherit;
+  touch-action: manipulation;
+}
+
+.card:active {
+  transform: scale(0.985);
+  background: var(--raised-press);
+}
+
+.thumb {
+  width: 108px;
+  height: 100%;
+  min-height: 118px;
+  object-fit: cover;
+  background: #1c1a16;
+  pointer-events: none;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 12px 10px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.card .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.best {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.more {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: inset 0 1px 0 rgba(247, 238, 224, 0.14);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.more:active { background: var(--raised-press); }
+
+.more-title {
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.more-body {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 4px;
+}
+
+.foot button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  touch-action: manipulation;
+}
+
+.foot button:active { opacity: 0.65; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  background: rgba(18, 17, 15, 0.72);
+}
+
+.modal[hidden] { display: none; }
+
+.sheet {
+  width: min(560px, 100%);
+  padding: 22px 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #1c1a16;
+  box-shadow: inset 0 1px 0 rgba(247, 238, 224, 0.14);
+}
+
+.sheet h2 { margin: 0 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -0.03em; }
+
+.sheet p { margin: 0 0 14px; color: var(--muted); font-size: 16px; line-height: 1.45; }
+
+.sheet button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 500;
+  font-size: 16px;
+  touch-action: manipulation;
+}
+
+.sheet button:active { opacity: 0.72; }

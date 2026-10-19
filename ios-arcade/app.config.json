@@ -1,0 +1,19 @@
+{
+  "bundleId": "space.galaxymind.arcade",
+  "appStoreName": "Galaxy Mind: Bitcoin Games",
+  "displayName": "Bitcoin Games",
+  "subtitle": "Arcade racing, HODL & sats fun",
+  "version": "1.0.0",
+  "gameCenterEnabled": false,
+  "leaderboards": {
+    "kart": "space.galaxymind.arcade.kart",
+    "saylor": "space.galaxymind.arcade.saylor",
+    "summit": "space.galaxymind.arcade.summit",
+    "chop": "space.galaxymind.arcade.chop",
+    "wen": "space.galaxymind.arcade.wen",
+    "gauntlet": "space.galaxymind.arcade.gauntlet",
+    "runner": "space.galaxymind.arcade.runner",
+    "horizon": "space.galaxymind.arcade.timechain",
+    "trail": "space.galaxymind.arcade.trail"
+  }
+}
