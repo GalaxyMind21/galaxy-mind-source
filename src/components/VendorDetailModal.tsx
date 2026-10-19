@@ -1,6 +1,6 @@
 "use client";
 
-import { isSafeHttpsHref } from "@/lib/safe-fetch";
+import { isSafeHttpsHref } from "@/lib/outbound-url";
 
 /* =====================================================================
  * VendorDetailModal · in-page magnified vendor view

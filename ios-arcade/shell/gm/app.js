@@ -309,6 +309,26 @@
     return "";
   }
 
+  /* Link scheme allowlist (CodeQL review, 2026-10). Only http:, https:
+     and links on this page's own origin go through; every other scheme
+     (javascript:, data:, vbscript:, file:, custom app schemes) is
+     blocked, so an empty host can never be mistaken for a local link.
+     A blob: URL is let through only when this page created it (its
+     inner origin is ours), which is how the games save screenshots.
+     Returns "block", "native" (let the browser handle it) or "route". */
+  function linkPolicy(url, loc) {
+    var proto = String(url.protocol || "").toLowerCase();
+    var ownProto = String(loc.protocol || "").toLowerCase();
+    var ownHost = String(loc.host || "").toLowerCase();
+    if (proto === "blob:") {
+      var prefix = "blob:" + ownProto + "//" + ownHost + "/";
+      return String(url.href).toLowerCase().indexOf(prefix) === 0 ? "native" : "block";
+    }
+    if (proto === "http:" || proto === "https:") return "route";
+    if (proto === ownProto && String(url.host || "").toLowerCase() === ownHost && ownHost) return "route";
+    return "block";
+  }
+
   document.addEventListener("click", function (e) {
     var a = e.target && e.target.closest ? e.target.closest("a") : null;
     if (!a) return;
@@ -316,8 +336,9 @@
     if (!href || href.charAt(0) === "#") return;
     var url;
     try { url = new URL(href, location.href); } catch (err) { return; }
-    if (url.protocol === "blob:" || url.protocol === "data:") return;
-    if (url.protocol === "javascript:") { e.preventDefault(); return; }
+    var policy = linkPolicy(url, location);
+    if (policy === "block") { e.preventDefault(); return; }
+    if (policy === "native") return;
     if (!isLocalHost(url.host)) {
       e.preventDefault();
       if (ALLOW_HOSTS[url.host.toLowerCase()]) openExternal(url.href);

@@ -78,8 +78,8 @@ import {
 import { firstPartyCorsHeaders } from "@/lib/first-party-origin";
 import {
   fetchNostrProfileMetadata,
-  resolveNostrHandleToPubkey,
 } from "@/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "@/lib/nostr-resolve";
 import { assessLnSubmission } from "@/lib/ln-guard";
 
 export const runtime = "nodejs";

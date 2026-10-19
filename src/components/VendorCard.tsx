@@ -34,7 +34,7 @@ import {
   alsoSoldOnLinks,
 } from "@/lib/vendors";
 import { xAvatarSrc } from "@/lib/avatars";
-import { isSafeHttpsHref } from "@/lib/safe-fetch";
+import { isSafeHttpsHref } from "@/lib/outbound-url";
 import { vendorShelf, shelfFits } from "@/lib/shelves";
 import { CountryMark } from "@/components/CountryMark";
 import { useHydrated } from "@/lib/use-hydrated";

@@ -4,12 +4,12 @@
    so the runtime never needs to do a relay query. */
 import { readFileSync, writeFileSync } from "node:fs";
 import { VENDORS, getPlatform, type Vendor } from "../src/lib/vendors";
-import { validateOutboundUrl } from "../src/lib/safe-fetch";
+import { validateOutboundUrl } from "../src/lib/outbound-url";
 import {
   decodeNostrBech32ToPubkey,
   fetchNostrProfileMetadata,
-  resolveNip05,
 } from "../src/lib/nostr-activity";
+import { resolveNip05 } from "../src/lib/nostr-resolve";
 
 async function resolveHandle(v: Vendor): Promise<string | null> {
   if (v.handle.startsWith("npub1") || v.handle.startsWith("nprofile1")) {

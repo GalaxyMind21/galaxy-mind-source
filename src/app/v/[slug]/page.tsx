@@ -64,7 +64,7 @@ import { getActivity, daysBetween } from "@/lib/vendor-activity";
 import { VendorPager } from "./VendorPager";
 import { VendorJourneyTracker } from "./VendorJourneyTracker";
 import { SiteHeader } from "@/components/SiteHeader";
-import { isSafeHttpsHref } from "@/lib/safe-fetch";
+import { isSafeHttpsHref } from "@/lib/outbound-url";
 
 const SITE_URL = "https://galaxymind.space";
 

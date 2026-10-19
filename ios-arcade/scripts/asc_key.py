@@ -184,6 +184,30 @@ def normalize(secret: str):
     raise AscKeyFormatError(_diag(secret, raw, utf8, False))
 
 
+def write_private(path: Path, data: bytes) -> None:
+    """Write a key file that is owner-only (0600) from the moment it exists.
+
+    write_bytes() then chmod() leaves the file at the umask default (often
+    0644) between the two calls. os.open with the mode creates it 0600, and
+    O_EXCL refuses to follow a pre-planted file or symlink at that path. A
+    stale key from an earlier step on the same runner is removed first.
+    """
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags, 0o600)
+    try:
+        os.fchmod(fd, 0o600)  # umask can only narrow the mode; make it exact
+        view = memoryview(data)
+        while view:
+            n = os.write(fd, view)
+            view = view[n:]
+    finally:
+        os.close(fd)
+
+
 def main() -> None:
     missing = [
         name
@@ -203,8 +227,7 @@ def main() -> None:
     except AscKeyFormatError as exc:
         raise SystemExit(str(exc))
     path = Path(runner) / f"AuthKey_{key_id}.p8"
-    path.write_bytes(pem.encode("ascii"))
-    path.chmod(0o600)
+    write_private(path, pem.encode("ascii"))
     written = path.read_bytes()
     if not written or not written.startswith(HEADER.encode("ascii")):
         raise SystemExit("ASC key file is empty")

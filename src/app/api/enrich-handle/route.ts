@@ -16,9 +16,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   fetchNostrProfileMetadata,
-  resolveNostrHandleToPubkey,
   type NostrProfile,
 } from "@/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "@/lib/nostr-resolve";
 import { safeFetch, validateOutboundUrl, readCappedJson } from "@/lib/safe-fetch";
 import { firstPartyCorsHeaders } from "@/lib/first-party-origin";
 import { isConsumerMailHandle } from "@/lib/submit-guard";

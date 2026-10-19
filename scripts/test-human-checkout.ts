@@ -19,7 +19,7 @@ import { handleOrder, handleQuote, handleAccess, checkoutView, orderLimit, human
 import {
   pickRequirement, buildTransferAuthorization, buildPaymentPayload, encodePaymentHeader, randomNonce, chainIdFromCaip2,
   PAY_ERROR_COPY, payErrorCopy, orderErrorCopy, ORDER_ERROR_COPY, walletErrorCopy, customUrlHint, usernameHint, usdcDisplay, balanceOfData, countdown, VALID_AFTER_SLACK_SEC,
-  txLink, parseSaved, resumePlan, collectDelayMs, collectStep, SAVED_MAX_AGE_MS, CLIENT_PAY_COPY,
+  txLink, parseSaved, resumePlan, savedOrderExpiresAt, expiredOrderVerdict, collectDelayMs, collectStep, SAVED_MAX_AGE_MS, CLIENT_PAY_COPY,
   payOutcome, cancelResult, signedStillChecking, SIGNED_GRACE_MS, signedUnpaidAction, requestOutcome,
   phonePayUrl, wantsPhoneQr, isTabletDevice, payUrlFor, payOrigin, parsePayLink, scheduleFragmentStrip, AI_POOL_CHECK_COPY, payLookup, notPayableCopy, RENTAL_ID_RE, CREATOR_SECRET_RE,
   isMobileDevice, handoffUrl, walletAppLinks, SIGNATURE_RE, isCounterfactualSignature, COUNTERFACTUAL_VERIFY_COPY,
@@ -470,9 +470,45 @@ const body = (o: Record<string, unknown> = {}) => ({ rigs: 2, days: 3, pool_id: 
     assert.equal(resumePlan(base, T0 + 11 * 60_000), "check", "unpaid + window over = ask the server (payment may have landed)");
     assert.equal(resumePlan({ ...base, paid: true }, T0 + 3 * 86_400_000), "collect", "paid = keep collecting, even days later");
     assert.equal(resumePlan(base, T0 + SAVED_MAX_AGE_MS + 1), "none", "very old unpaid, unsigned saved orders are dropped");
-    // Review #84 S2: a paid or signed (maybe-paid) order is never dropped automatically, however old.
+    // Review #84 S2: a paid or signed (maybe-paid) order outlives the unpaid limit, because it holds the only creator secret.
     assert.equal(resumePlan({ ...base, paid: true }, T0 + SAVED_MAX_AGE_MS + 1), "collect", "old paid order kept until the code is collected");
-    assert.equal(resumePlan({ ...base, signed: true }, T0 + 30 * 86_400_000), "collect", "old signed order kept until dismissed");
+    assert.equal(resumePlan({ ...base, signed: true }, T0 + 8 * 86_400_000), "collect", "old signed order kept through the grace period");
+    // CodeQL review 2026-10 (PR #188 M-1/S-5): only PAID orders have a TTL, and past it the page asks the server first.
+    assert.equal(savedOrderExpiresAt(base), T0 + 86_400_000 + SAVED_MAX_AGE_MS, "TTL = rental window + grace");
+    assert.equal(resumePlan({ ...base, paid: true }, savedOrderExpiresAt(base)), "collect", "paid order still collectable at the TTL edge");
+    assert.equal(resumePlan({ ...base, paid: true }, savedOrderExpiresAt(base) + 1), "expire-check", "paid order past its TTL asks the server, never cleared blind");
+    assert.equal(resumePlan({ ...base, signed: true }, T0 + 30 * 86_400_000), "collect", "signed order a month old is kept (overdue + Dismiss), never expired");
+    assert.equal(resumePlan({ ...base, signed: true }, T0 + 365 * 86_400_000), "collect", "signed order a year old is still kept");
+    assert.equal(resumePlan({ ...base, paid: true, days: 7 }, T0 + 14 * 86_400_000), "collect", "a 7-day rental keeps its token through window + grace");
+    assert.equal(resumePlan({ ...base, paid: true, days: 7 }, T0 + 15 * 86_400_000 + 1), "expire-check");
+    assert.equal(savedOrderExpiresAt({ savedAt: T0, days: 1e9 }), T0 + 90 * 86_400_000 + SAVED_MAX_AGE_MS, "a tampered days value is capped");
+    assert.equal(savedOrderExpiresAt({ savedAt: T0, days: Number.NaN }), T0 + 86_400_000 + SAVED_MAX_AGE_MS, "a bad days value falls back to one day");
+    // S-5: the server decides. Clear only on 200 + the authenticated view (rigs) + an ended state + no code on offer.
+    assert.equal(expiredOrderVerdict(200, { status: "completed", rigs: 1 }), "clear", "server says completed = clear");
+    assert.equal(expiredOrderVerdict(200, { status: "refunded", rigs: 2 }), "clear", "server says refunded = clear");
+    assert.equal(expiredOrderVerdict(200, { status: "completed", rigs: 1, accessCode: "TEST_" + "c".repeat(17) }), "keep", "a code still on offer = keep (collect it)");
+    // S5-a: the coarse view (secret missing, wrong or corrupted) has no rigs and must never clear.
+    assert.equal(expiredOrderVerdict(200, { status: "completed" }), "keep", "unauthenticated completed = keep");
+    assert.equal(expiredOrderVerdict(200, { status: "refunded" }), "keep", "unauthenticated refunded = keep");
+    assert.equal(expiredOrderVerdict(200, { rentalId: "r_test", status: "completed" } as { status: string }), "keep", "coarse {rentalId,status} = keep");
+    assert.equal(expiredOrderVerdict(200, { status: "active", rigs: 1 }), "keep", "still running = keep");
+    assert.equal(expiredOrderVerdict(200, { status: "delivering", rigs: 1 }), "keep");
+    assert.equal(expiredOrderVerdict(200, { status: "refund_pending", rigs: 1 }), "keep", "refund not settled = keep");
+    assert.equal(expiredOrderVerdict(0, null), "keep", "offline = keep");
+    assert.equal(expiredOrderVerdict(429, { error: "rate_limited" }), "keep", "rate limited = keep");
+    assert.equal(expiredOrderVerdict(503, { error: "rentals_paused" }), "keep", "paused = keep");
+    assert.equal(expiredOrderVerdict(500, null), "keep", "server error = keep");
+    assert.equal(expiredOrderVerdict(404, { error: "not_found" }), "keep", "not found = keep (never clear on a lookup miss)");
+    assert.equal(expiredOrderVerdict(200, null), "keep", "unreadable body = keep");
+    // The page wires it: expire-check goes through expiredOrderVerdict before clearSaved.
+    {
+      const page = readFileSync(join(process.cwd(), "src/app/hashrate/rent/RentCheckout.tsx"), "utf8");
+      const i = page.indexOf('plan === "expire-check"');
+      assert.ok(i > 0, "RentCheckout handles expire-check");
+      const block = page.slice(i, i + 1400);
+      assert.ok(block.includes("/api/rentals/access") && block.includes('expiredOrderVerdict(status, body) === "clear"'), "expire-check asks the server and clears only on clear");
+      assert.ok(block.indexOf("clearSaved()") > block.indexOf("expiredOrderVerdict("), "clearSaved only after the verdict");
+    }
     assert.equal(resumePlan({ ...base, signed: true }, T0), "collect", "signed but outcome unknown = check, never back to Pay");
     assert.equal(resumePlan({ ...base, signed: true }, T0 + 60 * 60_000), "collect");
     assert.equal(signedStillChecking(Date.parse(base.payBy) + SIGNED_GRACE_MS - 1, base.payBy), true, "keeps checking through window + grace");
@@ -543,7 +579,7 @@ const body = (o: Record<string, unknown> = {}) => ({ rigs: 2, days: 3, pool_id: 
     // Only done/refund clear the saved order; everything else keeps it.
     const ui = readFileSync(join(ROOT, "src/app/hashrate/rent/RentCheckout.tsx"), "utf8");
     const clears = [...ui.matchAll(/clearSaved\(\)/g)].length;
-    assert.ok(clears >= 2 && clears <= 8, "saved order cleared only in a few places (stale, done, refund x2, unpaid-expired, start over, closed start over, explicit dismiss): " + clears);
+    assert.ok(clears >= 2 && clears <= 9, "saved order cleared only in a few places (stale, server-confirmed ended, done, refund x2, unpaid-expired, start over, closed start over, explicit dismiss): " + clears);
     // Review #84 S2: the signed-but-unpaid branch never clears on its own; only the explicit Dismiss does.
     const run = ui.slice(ui.indexOf('if (st.kind === "unpaid" && !collecting.paidKnown && collecting.signed)'), ui.indexOf('if (st.kind === "unpaid" && !collecting.paidKnown) {'));
     assert.ok(run.length > 0 && !/clearSaved\(\)|setOrder\(null\)/.test(run) && /signedUnpaidAction\(/.test(run), "signed + unpaid keeps the saved order and keeps checking");

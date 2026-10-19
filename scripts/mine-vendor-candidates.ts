@@ -38,11 +38,11 @@ import { VENDORS } from "../src/lib/vendors";
 import {
   NOSTR_DEFAULT_RELAYS,
   decodeNostrBech32ToPubkey,
-  resolveNip05,
   verifyNostrEvent,
   fetchNostrProfileMetadata,
   type RawNostrEvent,
 } from "../src/lib/nostr-activity";
+import { resolveNip05 } from "../src/lib/nostr-resolve";
 
 const DAYS = (() => {
   const i = process.argv.indexOf("--days");

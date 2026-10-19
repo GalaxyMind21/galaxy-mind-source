@@ -12,8 +12,8 @@ import {
   decodeNostrBech32ToPubkey,
   fetchLastNostrActivity,
   fetchNostrProfileMetadata,
-  resolveNip05,
 } from "@/lib/nostr-activity";
+import { resolveNip05 } from "@/lib/nostr-resolve";
 import {
   extractPaymentMarkers,
   type PaymentMarkers,
@@ -98,7 +98,7 @@ export function classifyNostrActivity(activity: {
  * silently: the spec's table asks for "definitively resolves to a
  * DIFFERENT pubkey, or a definitive negative" to map to `gone`, distinct
  * from a "transient fetch failure" mapping to `unprobeable`. But
- * `resolveNip05` (src/lib/nostr-activity.ts) collapses EVERY failure
+ * `resolveNip05` (src/lib/nostr-resolve.ts) collapses EVERY failure
  * mode — DNS failure, HTTP failure, JSON parse failure, AND "the domain
  * answered fine but has no entry for this name" — into the same `null`
  * return; nothing in its return value lets a caller tell "the domain

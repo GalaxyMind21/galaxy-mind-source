@@ -15,7 +15,7 @@
 // only needed 30–300 chars, and nothing required the word bitcoin.
 // That payload is the fixture in scripts/test-submit-guard.ts.
 
-import { validateOutboundUrl } from "@/lib/safe-fetch";
+import { validateOutboundUrl } from "@/lib/outbound-url";
 import {
   CATEGORY_LABELS,
   type VendorCategory,

@@ -46,8 +46,8 @@ import {
 } from "../src/lib/vendors";
 import {
   fetchNostrProfileMetadata,
-  resolveNostrHandleToPubkey,
 } from "../src/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "../src/lib/nostr-resolve";
 import { snapshotXAvatar } from "./snapshot-avatars";
 import { printBadgeHandoff } from "./lib/badge-handoff";
 import { ISO_COUNTRY_NAMES, flagFor } from "../src/lib/iso-countries";

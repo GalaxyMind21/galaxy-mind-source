@@ -315,23 +315,64 @@ export function parseSaved(raw: string | null): SavedOrder | null {
 
 /**
  * Unpaid, unsigned saved orders older than this are dropped. A paid or signed
- * (maybe-paid) order is never dropped by age: it holds the only copy of the
- * creator secret, so it stays until the code is collected, the server confirms
- * a refund, or the renter dismisses it.
+ * (maybe-paid) order holds the only copy of the creator secret, so it is kept
+ * much longer: a signed-but-unpaid order is never dropped by age (review #84
+ * S2), and a paid one only after savedOrderExpiresAt AND server confirmation.
  */
 export const SAVED_MAX_AGE_MS = 8 * 86_400_000;
+
+/** Longest rental window the TTL will honour, so a tampered `days` can't make a token immortal. */
+const SAVED_MAX_RENTAL_DAYS = 90;
+
+/**
+ * Expiry for a PAID saved order (CodeQL review, 2026-10): the rental window
+ * plus SAVED_MAX_AGE_MS of grace. Past that the page asks the server whether
+ * the rental has ended (expiredOrderVerdict) and clears the creator secret only
+ * if it has. Signed-but-unpaid orders never use this: their outcome is unknown,
+ * so they stay on "collect" (overdue + Dismiss) until the server resolves them
+ * or the renter dismisses (review #84 S2, PR #188 M-1).
+ */
+export function savedOrderExpiresAt(saved: Pick<SavedOrder, "savedAt" | "days">): number {
+  const days = Number.isFinite(saved.days) && saved.days > 0 ? Math.min(Math.ceil(saved.days), SAVED_MAX_RENTAL_DAYS) : 1;
+  const savedAt = Number.isFinite(saved.savedAt) ? saved.savedAt : 0;
+  return savedAt + days * 86_400_000 + SAVED_MAX_AGE_MS;
+}
+
+/** Server states that mean a paid rental is over and its code can no longer be collected. */
+const ENDED_STATES: ReadonlySet<string> = new Set(["completed", "refunded"]);
+
+/**
+ * Decide, from one POST /api/rentals/access answer (rental_id + creator_secret),
+ * whether an expired paid saved order may be cleared. Only a clear "this rental
+ * is over" answer clears it: HTTP 200, the authenticated view (it carries
+ * `rigs`, the same test the cancel and pay paths use), an ended state, and no
+ * access code still on offer. Anything else (offline, 429, 5xx, not_found, a
+ * running state, a code still collectable, or the coarse unauthenticated
+ * {rentalId, status} view a wrong or corrupted secret gets) keeps the order,
+ * so the local clock alone can never drop the only copy of the secret.
+ */
+export function expiredOrderVerdict(status: number, body: { accessCode?: unknown; status?: unknown; rigs?: unknown; error?: unknown } | null): "clear" | "keep" {
+  if (status !== 200 || !body || typeof body !== "object") return "keep";
+  // Review S5-a: a 200 without `rigs` is the coarse view (the secret did not authenticate).
+  if (!("rigs" in body)) return "keep";
+  if (typeof body.accessCode === "string" && body.accessCode) return "keep";
+  return typeof body.status === "string" && ENDED_STATES.has(body.status) ? "clear" : "keep";
+}
 
 /**
  * What to do with a saved order on page load.
  * - collect: payment went through (or may have); fetch the access code, patiently.
+ * - expire-check: a paid order past savedOrderExpiresAt; ask the server once
+ *   (expiredOrderVerdict) and clear it only if the rental has ended, else collect.
  * - pay: still unpaid and inside the pay window; resume step 3.
  * - check: the window passed without a recorded payment; ask the server once
  *   (a payment may have landed while the tab was closed), then collect or drop.
  * - none: nothing usable.
  */
-export function resumePlan(saved: SavedOrder | null, nowMs: number): "none" | "collect" | "pay" | "check" {
+export function resumePlan(saved: SavedOrder | null, nowMs: number): "none" | "collect" | "expire-check" | "pay" | "check" {
   if (!saved) return "none";
-  if (saved.paid || saved.signed) return "collect";
+  if (saved.paid) return nowMs > savedOrderExpiresAt(saved) ? "expire-check" : "collect";
+  if (saved.signed) return "collect";
   if (nowMs - (saved.savedAt || 0) > SAVED_MAX_AGE_MS) return "none";
   return Date.parse(saved.payBy) > nowMs ? "pay" : "check";
 }

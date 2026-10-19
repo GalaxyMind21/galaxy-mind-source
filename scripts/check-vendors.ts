@@ -22,7 +22,7 @@ import {
   type Vendor,
   alsoSoldOnLinks,
 } from "../src/lib/vendors";
-import { validateOutboundUrl } from "../src/lib/safe-fetch";
+import { validateOutboundUrl } from "../src/lib/outbound-url";
 import { hasControlledSubstanceCopy } from "../src/lib/submit-guard";
 import AVATAR_MANIFEST from "../src/lib/avatar-manifest.json";
 import SHELF_MANIFEST from "../src/lib/shelf-manifest.json";
