@@ -41,7 +41,7 @@
  * what the pack SHOULD contain; the relay copy is a snapshot.
  */
 import { VENDORS } from "../src/lib/vendors";
-import { resolveNostrHandleToPubkey } from "../src/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "../src/lib/nostr-resolve";
 
 // ─────────────────────────────────────────────────────────────────
 // bech32 ENCODE · local to this script on purpose.

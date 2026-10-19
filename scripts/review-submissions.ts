@@ -54,7 +54,7 @@ import {
   ownershipGate,
 } from "../src/lib/vendor-dedupe";
 import { untrustedWebsiteReview } from "../src/lib/submit-guard";
-import { resolveNostrHandleToPubkey } from "../src/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "../src/lib/nostr-resolve";
 import { isSafeHttpsHref, safeFetch } from "../src/lib/safe-fetch";
 import { printBadgeHandoff } from "./lib/badge-handoff";
 import {

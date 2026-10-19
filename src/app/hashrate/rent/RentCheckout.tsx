@@ -30,7 +30,7 @@ import { SupportLine } from "../components/SupportLine";
 import {
   pickRequirement, randomNonce, buildTransferAuthorization, buildPaymentPayload, encodePaymentHeader,
   balanceOfData, usdcDisplay, payErrorCopy, orderErrorCopy, walletErrorCopy, customUrlHint, usernameHint,
-  countdown, txLink, parseSaved, resumePlan, collectDelayMs, collectStep, SAVED_ORDER_KEY,
+  countdown, txLink, parseSaved, resumePlan, expiredOrderVerdict, collectDelayMs, collectStep, SAVED_ORDER_KEY,
   payOutcome, cancelResult, signedUnpaidAction, requestOutcome,
   parsePayLink, scheduleFragmentStrip, payLookup, AI_POOL_CHECK_COPY, AI_POOL_CHECK_WHY, notPayableCopy, RENTAL_ID_RE, CREATOR_SECRET_RE,
   isMobileDevice, handoffUrl, walletAppLinks, isCounterfactualSignature, chainIdFromCaip2, COUNTERFACTUAL_VERIFY_COPY,
@@ -64,6 +64,8 @@ const OTHER = "other";
 const HELD_COPY = "Pools that aren't on this list need a quick manual check before your rigs switch. It can take up to about 2 hours, and if it isn't approved you get a full refund.";
 
 // The saved order (with the creator secret) lives in localStorage until the access code is collected.
+// A PAID order past savedOrderExpiresAt (rental window + grace) is cleared only after the server confirms
+// the rental has ended (expiredOrderVerdict); a signed-but-unpaid order is never cleared by age.
 const saveOrder = (o: Order) => { try { localStorage.setItem(SAVED_ORDER_KEY, JSON.stringify(o)); } catch { /* ignore */ } };
 const clearSaved = () => { try { localStorage.removeItem(SAVED_ORDER_KEY); } catch { /* ignore */ } };
 const readSaved = () => { try { return parseSaved(localStorage.getItem(SAVED_ORDER_KEY)); } catch { return null; } };
@@ -184,6 +186,21 @@ export function RentCheckout({ view, support }: { view: OpenView; support: Suppo
       else setAiLink(link);
     }
     const plan = resumePlan(saved, Date.now());
+    if (saved && plan === "expire-check") {
+      // Past its TTL. Ask the server once; clear only on a definite "rental is over", otherwise keep
+      // collecting exactly as before (offline or an unclear answer must never drop the secret).
+      void (async () => {
+        let status = 0, body: { accessCode?: unknown; status?: unknown; rigs?: unknown } | null = null;
+        try {
+          const r = await fetch("/api/rentals/access", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ rental_id: saved.rentalId, creator_secret: saved.creatorSecret }) });
+          status = r.status; body = await r.json().catch(() => null);
+        } catch { status = 0; }
+        if (expiredOrderVerdict(status, body) === "clear") { clearSaved(); return; }
+        setOrder(saved); setRigs(saved.rigs); setDays(saved.days);
+        setStep(4); setCollecting({ paidKnown: true, signed: false, tx: saved.tx ?? null, outcome: "settled" });
+      })();
+      return;
+    }
     if (!saved || plan === "none") {
       clearSaved();
       // "Rent now" on /hashrate passes the chosen pack and window (?rigs=2&days=3). Clamp to this page's limits.

@@ -1,9 +1,16 @@
 name: iOS simulator
 
+# macOS minutes bill at 10x, so this runs only when the app build inputs change. The Gemfile and
+# Gemfile.lock only feed the TestFlight release tooling (the simulator build never uses them),
+# and Markdown never reaches the build. Not a required check: verify still runs the iOS script tests
+# (validate.mjs, test-asc-key*.py, test-p12-export.rb) on every PR.
 on:
   pull_request:
     paths:
       - "ios-arcade/**"
+      - "!ios-arcade/Gemfile"
+      - "!ios-arcade/Gemfile.lock"
+      - "!ios-arcade/**/*.md"
       - ".github/workflows/ios-simulator.yml"
   workflow_dispatch:
 
@@ -11,10 +18,15 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same PR cancels the older in-progress macOS build.
+concurrency:
+  group: ios-simulator-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   simulator:
     runs-on: macos-15
-    timeout-minutes: 40
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ios-arcade

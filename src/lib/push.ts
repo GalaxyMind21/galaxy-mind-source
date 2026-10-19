@@ -29,8 +29,22 @@
 // rejects private ranges / localhost / non-443 ports before storage,
 // and the payload is always the public broadcast alert · nothing
 // per-user ever rides a push.
+//
+// Push-service allowlist (CodeQL review follow-up, 2026-10): web-push
+// opens its own HTTPS connection with the system resolver, so a
+// hostname that passes validateOutboundUrl but resolves to a private
+// address was still reachable. Every real browser subscription points
+// at a known push service, so the endpoint host must be one of them
+// (isKnownPushEndpoint). New subscriptions on any other host are
+// rejected when saved. Stored records on an unlisted host are SKIPPED at
+// send time, not deleted, and only their host is logged (never the path
+// or token), so the hosts in use are visible before anything is pruned.
+// Sends also go through a DNS-pinned agent (createPinnedLookup from
+// ./safe-fetch): every resolved address must pass isBlockedIp, and the
+// socket connects only to an address that was checked.
 
 import { createHash } from "node:crypto";
+import { Agent } from "node:https";
 import webpush from "web-push";
 import {
   kvDel,
@@ -42,7 +56,8 @@ import {
   kvZTop,
   kvZTrimTop,
 } from "./kv";
-import { validateOutboundUrl } from "./safe-fetch";
+import { validateOutboundUrl } from "./outbound-url";
+import { createPinnedLookup } from "./safe-fetch";
 
 const KEY_PREFIX = "push:sub:";
 // Recency-ranked sorted set of subscription ids (2026-07-10 · H5). The
@@ -104,6 +119,83 @@ export function subscriptionId(endpoint: string): string {
   return createHash("sha256").update(endpoint).digest("hex").slice(0, 32);
 }
 
+/**
+ * Push services a browser subscription can legitimately point at.
+ * Exact hosts match as-is; suffixes match only on a dot boundary, so
+ * "evilpush.apple.com" or "push.apple.com.evil.example" never match.
+ *   - Chrome, Edge (Chromium), Opera, Brave: Firebase Cloud Messaging
+ *     (plus jmt17.google.com, used by older Chrome subscriptions)
+ *   - Firefox: Mozilla autopush
+ *   - Safari (macOS, iOS / iPadOS home-screen apps): Apple Push
+ *   - Legacy Edge / Windows: Windows Push Notification Services
+ */
+export const PUSH_SERVICE_HOSTS: readonly string[] = [
+  "fcm.googleapis.com",
+  // Older Chrome subscriptions still in the wild point here.
+  "jmt17.google.com",
+];
+export const PUSH_SERVICE_SUFFIXES: readonly string[] = [
+  ".push.services.mozilla.com",
+  ".push.apple.com",
+  ".notify.windows.com",
+];
+
+/**
+ * True when `endpoint` is an HTTPS URL on port 443 whose host is a
+ * known push service, with no userinfo. Also runs the house SSRF
+ * guard, so the allowlist can only ever narrow it.
+ */
+export function isKnownPushEndpoint(endpoint: unknown): boolean {
+  if (typeof endpoint !== "string" || endpoint.length === 0 || endpoint.length > 1024) return false;
+  if (!validateOutboundUrl(endpoint).ok) return false;
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:" || (url.port && url.port !== "443")) return false;
+  if (url.username || url.password) return false;
+  const host = url.hostname.toLowerCase().replace(/\.+$/, "");
+  if (PUSH_SERVICE_HOSTS.includes(host)) return true;
+  return PUSH_SERVICE_SUFFIXES.some(
+    (suffix) => host.endsWith(suffix) && host.length > suffix.length,
+  );
+}
+
+/** Split stored subscriptions into ones we may send to and ones on an
+ *  unlisted host (skipped: kept in storage, never contacted). */
+export function partitionSendable<T extends { endpoint: string }>(
+  subs: readonly T[],
+): { sendable: T[]; skipped: T[] } {
+  const sendable: T[] = [];
+  const skipped: T[] = [];
+  for (const s of subs) (isKnownPushEndpoint(s.endpoint) ? sendable : skipped).push(s);
+  return { sendable, skipped };
+}
+
+/**
+ * Count skipped records by HOST only. The endpoint path and query carry
+ * the subscription token, so they never reach a log line or a result.
+ */
+export function skippedHostCounts(subs: readonly { endpoint: string }[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const s of subs) {
+    let host = "(unparseable)";
+    try {
+      host = new URL(s.endpoint).hostname.toLowerCase() || "(empty)";
+    } catch {
+      /* keep the placeholder; never echo the raw value */
+    }
+    counts[host] = (counts[host] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/** DNS-pinned agent for web-push. Every resolved address must pass
+ *  isBlockedIp, and the socket connects only to a checked address. */
+export const pushAgent = new Agent({ lookup: createPinnedLookup() });
+
 /** Validate an incoming subscription's shape + endpoint safety.
  *  Returns an error string (for a 400 body) or null when valid. */
 export function validateSubscription(s: unknown): string | null {
@@ -115,6 +207,7 @@ export function validateSubscription(s: unknown): string | null {
   if (endpoint.length > 1024) return "endpoint too long";
   const safe = validateOutboundUrl(endpoint);
   if (!safe.ok) return `endpoint rejected: ${safe.reason}`;
+  if (!isKnownPushEndpoint(endpoint)) return "endpoint rejected: not a known push service";
   const keys = sub.keys as Record<string, unknown> | undefined;
   const p256dh = keys?.p256dh;
   const auth = keys?.auth;
@@ -204,6 +297,8 @@ export type PushBroadcastResult = {
   attempted: number;
   delivered: number;
   pruned: number;
+  /** Stored records on a host outside the push-service allowlist: skipped (kept, never contacted). */
+  skipped?: number;
   firstError?: string;
 };
 
@@ -225,10 +320,23 @@ export async function broadcastPush(
   applyVapid();
   const topic = opts?.topic ?? "gauge";
   // Legacy records (no topics field) predate topics and mean gauge-only.
-  const subs = (await listSubscriptions()).filter((s) =>
+  const topical = (await listSubscriptions()).filter((s) =>
     (s.topics ?? ["gauge"]).includes(topic),
   );
-  if (subs.length === 0) return { attempted: 0, delivered: 0, pruned: 0 };
+  // Re-check every endpoint right before sending. Records on an unlisted
+  // host (saved before the allowlist existed) are skipped, NOT deleted, and
+  // only their hosts are logged, so we can see which services exist before
+  // deciding on any pruning.
+  const { sendable: subs, skipped } = partitionSendable(topical);
+  if (skipped.length > 0) {
+    console.warn(
+      `[push] skipped ${skipped.length} subscription(s) on unlisted hosts · ${JSON.stringify(skippedHostCounts(skipped))}`,
+    );
+  }
+  const skippedField = skipped.length ? { skipped: skipped.length } : {};
+  if (subs.length === 0) {
+    return { attempted: 0, delivered: 0, pruned: 0, ...skippedField };
+  }
 
   const json = JSON.stringify(payload);
   let delivered = 0;
@@ -242,7 +350,7 @@ export async function broadcastPush(
         json,
         // 4h TTL · a stale buying-signal push delivered tomorrow is
         // worse than no push. Urgency high = wake the radio on mobile.
-        { TTL: 4 * 3600, urgency: "high" },
+        { TTL: 4 * 3600, urgency: "high", agent: pushAgent },
       ),
     ),
   );
@@ -262,5 +370,11 @@ export async function broadcastPush(
         r.reason instanceof Error ? r.reason.message : String(r.reason);
     }
   }
-  return { attempted: subs.length, delivered, pruned, firstError };
+  return {
+    attempted: subs.length,
+    delivered,
+    pruned,
+    ...skippedField,
+    firstError,
+  };
 }

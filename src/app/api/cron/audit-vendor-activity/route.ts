@@ -46,8 +46,8 @@ import {
 import { setActivity } from "@/lib/vendor-activity";
 import {
   fetchLastNostrActivity,
-  resolveNostrHandleToPubkey,
 } from "@/lib/nostr-activity";
+import { resolveNostrHandleToPubkey } from "@/lib/nostr-resolve";
 import { VENDORS, getPlatform } from "@/lib/vendors";
 
 export const dynamic = "force-dynamic";

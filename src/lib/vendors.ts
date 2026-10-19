@@ -339,10 +339,25 @@ export function getDisplayHandle(
  * the second vendor's name).
  */
 export function vendorSlug(v: { name: string }): string {
+  // split/filter/join instead of a ^-+|-+$ trim regex: linear on any
+  // input (CodeQL js/polynomial-redos), and it collapses runs the same way.
   return v.name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .split("-")
+    .filter(Boolean)
+    .join("-");
+}
+
+/**
+ * Drop every trailing "/" from a string. A plain loop, not a regex:
+ * `/\/+$/` backtracks quadratically on long runs of slashes (CodeQL
+ * js/polynomial-redos), and this runs on user-submitted URLs.
+ */
+export function trimTrailingSlashes(s: string): string {
+  let end = s.length;
+  while (end > 0 && s.charCodeAt(end - 1) === 47 /* "/" */) end--;
+  return end === s.length ? s : s.slice(0, end);
 }
 
 /**
@@ -376,10 +391,10 @@ export function normalizeWebsite(url: string): string {
   try {
     const u = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`);
     const host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/\.$/, "");
-    const path = u.pathname.replace(/\/+$/, "").toLowerCase();
+    const path = trimTrailingSlashes(u.pathname).toLowerCase();
     return host + path;
   } catch {
-    return raw.toLowerCase().replace(/\/+$/, "");
+    return trimTrailingSlashes(raw.toLowerCase());
   }
 }
 

@@ -124,49 +124,10 @@ export function decodeNostrBech32ToPubkey(handle: string): string | null {
 // NIP-05 resolution · name@domain → pubkey hex
 // ─────────────────────────────────────────────────────────────────
 
-/**
- * Resolve a NIP-05 identifier (`name@domain.tld`) to the hex pubkey
- * the domain claims. Returns null on any failure (DNS, HTTP, JSON
- * parse, name not listed).
- */
-export async function resolveNip05(
-  identifier: string,
-  fetchTimeoutMs = 5_000,
-): Promise<string | null> {
-  if (!identifier.includes("@")) return null;
-  const [name, domain] = identifier.split("@");
-  if (!name || !domain) return null;
-  // SSRF guard · the `domain` portion of a NIP-05 identifier is
-  // user-controlled (vendor-supplied via /submit form or auto-fetch
-  // from existing vendor handles). Validate before making the
-  // outbound HTTPS GET to block private IPs, IPv6 literals, custom
-  // ports, *.local hostnames, etc. See lib/safe-fetch.ts.
-  const url = `https://${domain}/.well-known/nostr.json?name=${encodeURIComponent(name)}`;
-  // Lazy import so this lib stays usable in scripts that don't have
-  // the safe-fetch module on the resolution path. Same effective
-  // dep, no extra cost in the prod bundle (Next inlines).
-  const { safeFetch, readCappedJson } = await import("./safe-fetch");
-  try {
-    // safeFetch validates the initial URL AND re-validates every
-    // redirect hop. A bare fetch follows 3xx by default, so a validated
-    // attacker-owned domain could 302 us into loopback / the cloud
-    // metadata IP with the guard never running again (2026-08 audit).
-    // NIP-05 endpoints legitimately redirect (www -> apex), so we
-    // follow-and-revalidate rather than refusing 3xx outright.
-    const r = await safeFetch(url, {
-      signal: AbortSignal.timeout(fetchTimeoutMs),
-      headers: { "User-Agent": "GalaxyMind/1.0" },
-    });
-    if (!r || !r.ok) return null;
-    const data = (await readCappedJson(r)) as {
-      names?: Record<string, string>;
-    } | null;
-    if (!data) return null;
-    return pickNip05Name(data.names, name);
-  } catch {
-    return null;
-  }
-}
+// resolveNip05 and resolveNostrHandleToPubkey live in ./nostr-resolve
+// (server-only): they fetch user-controlled domains through safeFetch,
+// which uses node:https for DNS pinning, and this module is also loaded
+// by client components (VendorRecentPosts, LiveEconomyStrip).
 
 /**
  * Look up a NIP-05 local part in a `names` map, case-insensitively
@@ -753,28 +714,4 @@ function queryRelayForKind0(
       done(null);
     });
   });
-}
-
-// ─────────────────────────────────────────────────────────────────
-// Convenience: resolve a vendor handle to its pubkey
-// ─────────────────────────────────────────────────────────────────
-
-/**
- * Resolves a Nostr-platform vendor handle to its hex pubkey,
- * handling all three handle formats:
- *   NIP-05:      name@domain.tld   → DNS lookup
- *   bech32 npub: npub1...          → bech32 decode
- *   bech32 nprofile: nprofile1...  → bech32 + TLV walk
- * Returns null on any failure.
- */
-export async function resolveNostrHandleToPubkey(
-  handle: string,
-): Promise<string | null> {
-  if (handle.startsWith("npub1") || handle.startsWith("nprofile1")) {
-    return decodeNostrBech32ToPubkey(handle);
-  }
-  if (handle.includes("@")) {
-    return resolveNip05(handle);
-  }
-  return null;
 }

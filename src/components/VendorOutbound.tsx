@@ -19,7 +19,7 @@
  */
 import type { ReactNode } from "react";
 import { track } from "@vercel/analytics";
-import { isSafeHttpsHref } from "@/lib/safe-fetch";
+import { isSafeHttpsHref } from "@/lib/outbound-url";
 
 const SITE = "https://galaxymind.space";
 

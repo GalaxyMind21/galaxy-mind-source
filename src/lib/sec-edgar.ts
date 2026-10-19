@@ -52,7 +52,7 @@
 //   - FWP, 424B*, 425, etc.: prospectus addenda · too granular
 // If the page ever wants a "show all forms" toggle, drop the filter.
 
-import { validateOutboundUrl } from "./safe-fetch";
+import { validateOutboundUrl } from "./outbound-url";
 
 // Forms that count as "newsworthy" for the /treasuries panel.
 // Order matters for tie-breaking in the rare event of two filings on

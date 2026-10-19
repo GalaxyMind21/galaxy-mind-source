@@ -16,6 +16,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
+import { prodApiUrl, staticFilePath } from "./lib/local-static.mjs";
 
 const [, , NAME = "sizzle", PROFILE = "veteran", SECS = "26"] = process.argv;
 const seconds = Math.max(8, Math.min(60, Number(SECS) | 0));
@@ -27,12 +28,16 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/jav
   ".css": "text/css", ".json": "application/json", ".png": "image/png", ".m4a": "audio/mp4" };
 
 const server = createServer(async (req, res) => {
-  const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+  const rawPath = new URL(req.url, "http://x").pathname;
+  let path;
+  try { path = decodeURIComponent(rawPath); } catch { res.writeHead(400); res.end(); return; }
   // proxy the live-world endpoints to production: the sizzle must show a
   // REAL block height and pool in the HUD, not "practice block"
   if (path.startsWith("/api/")) {
     try {
-      const up = await fetch("https://galaxymind.space" + path);
+      const target = prodApiUrl(path);
+      if (!target) { res.writeHead(404); res.end(); return; }
+      const up = await fetch(target);
       const body = Buffer.from(await up.arrayBuffer());
       res.writeHead(up.status, { "content-type": up.headers.get("content-type") || "application/json" });
       res.end(body);
@@ -40,7 +45,8 @@ const server = createServer(async (req, res) => {
     return;
   }
   try {
-    const file = join(ROOT, path === "/" ? "/chop/index.html" : path);
+    const file = staticFilePath(ROOT, rawPath);
+    if (!file) { res.writeHead(403); res.end(); return; }
     const body = await readFile(file);
     res.writeHead(200, { "content-type": MIME[extname(file)] || "application/octet-stream" });
     res.end(body);

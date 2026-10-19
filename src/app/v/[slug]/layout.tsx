@@ -12,7 +12,7 @@ import {
 } from "@/lib/vendors";
 import { ownerOrganizationLd } from "@/lib/vendor-owner-ld";
 import { safeJsonLd } from "@/lib/json-ld";
-import { isSafeHttpsHref } from "@/lib/safe-fetch";
+import { isSafeHttpsHref } from "@/lib/outbound-url";
 
 const SITE_URL = "https://galaxymind.space";
 

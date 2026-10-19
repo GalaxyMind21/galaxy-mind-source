@@ -26,7 +26,7 @@
 // 36px display slot (72px @2x) — the size param cuts ~85% of the
 // image bytes for the not-yet-snapshotted fallback minority.
 import manifest from "./avatar-manifest.json";
-import { isSafeHttpsHref } from "./safe-fetch";
+import { isSafeHttpsHref } from "./outbound-url";
 
 // Keys are LOWERCASE handles (macOS dev FS is case-insensitive but
 // the deploy target is case-sensitive linux · lowercasing both the
