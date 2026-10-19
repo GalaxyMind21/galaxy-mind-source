@@ -15,7 +15,7 @@
     "cap:sync": "cap sync ios"
   },
   "dependencies": {
-    "@capacitor/core": "^7.4.3",
+    "@capacitor/core": "^8.5.3",
     "@capacitor/ios": "^7.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
